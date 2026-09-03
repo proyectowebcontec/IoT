@@ -1,0 +1,939 @@
+/* ============================= */
+/* VARIABLES DE COLOR CONTEC      */
+/* ============================= */
+
+:root {
+
+    --contec-blue: #005b96;
+    --contec-blue-dark: #003f6b;
+    --contec-blue-light: #eaf4fb;
+
+    --contec-orange: #f28c28;
+    --contec-orange-light: #fff1e3;
+
+    --contec-yellow: #f4c430;
+    --contec-yellow-light: #fff9dc;
+
+    --contec-gray: #5f6770;
+    --contec-gray-light: #f2f4f6;
+
+    --background: #f5f7fa;
+
+    --text-main: #263238;
+    --text-secondary: #6c757d;
+
+    --border: #e1e5e9;
+
+    --white: #ffffff;
+
+    --shadow:
+        0 4px 14px rgba(0, 0, 0, 0.06);
+
+}
+
+
+/* ============================= */
+/* GENERAL                        */
+/* ============================= */
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    background-color: var(--background) !important;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    color: var(--text-main);
+
+}
+
+
+.content {
+
+    width: min(1500px, 94%);
+
+    margin: 0 auto;
+
+    padding:
+        30px
+        0
+        60px;
+
+}
+
+
+/* ============================= */
+/* HEADER                         */
+/* ============================= */
+
+.header {
+
+    min-height: 78px;
+
+    padding:
+        14px
+        4%;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            120deg,
+            var(--contec-blue-dark),
+            var(--contec-blue)
+        );
+
+    color: var(--white);
+
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.15);
+
+}
+
+
+.logo {
+
+    font-size: 1.45rem;
+
+    font-weight: 700;
+
+    letter-spacing: 0.3px;
+
+}
+
+
+.header-subtitle {
+
+    margin-top: 2px;
+
+    font-size: 0.78rem;
+
+    opacity: 0.8;
+
+}
+
+
+.header-status {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 0.88rem;
+
+    padding:
+        7px
+        13px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255,255,255,0.12);
+
+}
+
+
+.status-indicator {
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background-color: #55d978;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(85, 217, 120, 0.15);
+
+}
+
+
+/* ============================= */
+/* CABECERA DE PÁGINA             */
+/* ============================= */
+
+.page-header {
+
+    margin-bottom: 22px;
+
+}
+
+
+.page-header h1 {
+
+    margin-bottom: 3px;
+
+    font-size: 1.8rem;
+
+    font-weight: 700;
+
+    color: var(--contec-blue-dark);
+
+}
+
+
+.page-header p {
+
+    margin: 0;
+
+    color: var(--text-secondary);
+
+    font-size: 0.92rem;
+
+}
+
+
+/* ============================= */
+/* NAVBAR                         */
+/* ============================= */
+
+.dashboard-navbar {
+
+    margin-bottom: 18px;
+
+    padding:
+        6px
+        12px !important;
+
+    background-color: var(--white);
+
+    border-radius: 8px;
+
+    border:
+        1px solid var(--border);
+
+    box-shadow: var(--shadow);
+
+}
+
+
+.dashboard-navbar .navbar-brand {
+
+    color: var(--contec-blue-dark);
+
+    font-weight: 700;
+
+}
+
+
+.dashboard-navbar .nav-link {
+
+    padding:
+        12px
+        15px !important;
+
+    color: var(--contec-gray);
+
+    font-weight: 500;
+
+    border-bottom:
+        3px solid transparent;
+
+}
+
+
+.dashboard-navbar .nav-link:hover {
+
+    color: var(--contec-blue);
+
+}
+
+
+.dashboard-navbar .nav-link.active {
+
+    color: var(--contec-blue);
+
+    border-bottom-color:
+        var(--contec-orange);
+
+}
+
+
+/* ============================= */
+/* FILTROS                        */
+/* ============================= */
+
+.filters-panel {
+
+    margin-bottom: 22px;
+
+    padding: 20px;
+
+    background-color: var(--white);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    box-shadow: var(--shadow);
+
+    border-left:
+        5px solid var(--contec-blue);
+
+}
+
+
+.filters-title {
+
+    margin-bottom: 16px;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+}
+
+
+.filters-title h2 {
+
+    margin: 0;
+
+    font-size: 1.05rem;
+
+    font-weight: 700;
+
+}
+
+
+.filters-title p {
+
+    margin:
+        3px
+        0
+        0;
+
+    color: var(--text-secondary);
+
+    font-size: 0.82rem;
+
+}
+
+
+.filters-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr
+        1.2fr
+        1fr
+        1fr
+        auto;
+
+    gap: 15px;
+
+    align-items: end;
+
+}
+
+
+.filter-group {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+}
+
+
+.filter-group label {
+
+    font-size: 0.78rem;
+
+    font-weight: 600;
+
+    color: var(--contec-gray);
+
+}
+
+
+.filter-group .form-select,
+.filter-group .form-control {
+
+    min-height: 42px;
+
+    border-color: var(--border);
+
+    font-size: 0.86rem;
+
+}
+
+
+.filter-group .form-select:focus,
+.filter-group .form-control:focus {
+
+    border-color: var(--contec-blue);
+
+    box-shadow:
+        0 0 0 0.2rem
+        rgba(0, 91, 150, 0.12);
+
+}
+
+
+.btn-filter {
+
+    height: 42px;
+
+    padding:
+        0
+        22px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    background-color: var(--contec-orange);
+
+    color: var(--white);
+
+    font-weight: 600;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.15s ease;
+
+}
+
+
+.btn-filter:hover {
+
+    background-color: #dd791c;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* ============================= */
+/* TARJETAS KPI                   */
+/* ============================= */
+
+.cards-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 16px;
+
+    margin-bottom: 28px;
+
+}
+
+
+.metric-card {
+
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 135px;
+
+    padding: 18px;
+
+    border-radius: 10px;
+
+    border:
+        1px solid var(--border);
+
+    background-color: var(--white);
+
+    box-shadow: var(--shadow);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+.metric-card:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,0.09);
+
+}
+
+
+.metric-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 5px;
+
+}
+
+
+.blue-card::before {
+    background-color: var(--contec-blue);
+}
+
+
+.orange-card::before {
+    background-color: var(--contec-orange);
+}
+
+
+.yellow-card::before {
+    background-color: var(--contec-yellow);
+}
+
+
+.gray-card::before {
+    background-color: var(--contec-gray);
+}
+
+
+.metric-card-header {
+
+    margin-bottom: 10px;
+
+    color: var(--text-secondary);
+
+    font-size: 0.8rem;
+
+    font-weight: 600;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+
+}
+
+
+.metric-value {
+
+    margin-bottom: 4px;
+
+    font-size: 2rem;
+
+    line-height: 1;
+
+    font-weight: 700;
+
+    color: var(--text-main);
+
+}
+
+
+.metric-description {
+
+    margin-top: 10px;
+
+    color: var(--text-secondary);
+
+    font-size: 0.76rem;
+
+}
+
+
+/* ============================= */
+/* SECCIONES                      */
+/* ============================= */
+
+.section-block {
+
+    margin-bottom: 30px;
+
+}
+
+
+.section-header {
+
+    margin-bottom: 14px;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+
+.section-header h2 {
+
+    margin: 0;
+
+    font-size: 1.1rem;
+
+    font-weight: 700;
+
+    color: var(--contec-blue-dark);
+
+}
+
+
+.section-header p {
+
+    margin:
+        3px
+        0
+        0;
+
+    color: var(--text-secondary);
+
+    font-size: 0.82rem;
+
+}
+
+
+/* ============================= */
+/* TARJETAS DE PROMEDIOS          */
+/* ============================= */
+
+.averages-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 15px;
+
+}
+
+
+.average-card {
+
+    min-height: 92px;
+
+    padding: 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    background-color: var(--white);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 9px;
+
+    box-shadow: var(--shadow);
+
+}
+
+
+.average-icon {
+
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    font-size: 0.78rem;
+
+    font-weight: 700;
+
+}
+
+
+.average-blue {
+
+    color: var(--contec-blue);
+
+    background-color:
+        var(--contec-blue-light);
+
+}
+
+
+.average-orange {
+
+    color: var(--contec-orange);
+
+    background-color:
+        var(--contec-orange-light);
+
+}
+
+
+.average-yellow {
+
+    color: #987300;
+
+    background-color:
+        var(--contec-yellow-light);
+
+}
+
+
+.average-gray {
+
+    color: var(--contec-gray);
+
+    background-color:
+        var(--contec-gray-light);
+
+}
+
+
+.average-label {
+
+    color: var(--text-secondary);
+
+    font-size: 0.76rem;
+
+}
+
+
+.average-value {
+
+    margin-top: 2px;
+
+    font-size: 1.35rem;
+
+    font-weight: 700;
+
+    color: var(--text-main);
+
+}
+
+
+/* ============================= */
+/* GRÁFICAS                       */
+/* ============================= */
+
+.charts-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 18px;
+
+}
+
+
+.chart-card {
+
+    min-width: 0;
+
+    padding: 18px;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 10px;
+
+    background-color: var(--white);
+
+    box-shadow: var(--shadow);
+
+}
+
+
+.chart-header {
+
+    margin-bottom: 12px;
+
+    padding-bottom: 10px;
+
+    border-bottom:
+        1px solid #eef0f2;
+
+}
+
+
+.chart-header h3 {
+
+    margin: 0;
+
+    font-size: 0.96rem;
+
+    font-weight: 700;
+
+    color: var(--text-main);
+
+}
+
+
+.chart-header p {
+
+    margin:
+        2px
+        0
+        0;
+
+    color: var(--text-secondary);
+
+    font-size: 0.76rem;
+
+}
+
+
+.chart-container {
+
+    position: relative;
+
+    height: 310px;
+
+}
+
+
+/* ============================= */
+/* RESPONSIVE                     */
+/* ============================= */
+
+@media (max-width: 1200px) {
+
+    .filters-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+
+    .filter-button {
+
+        grid-column:
+            span 2;
+
+    }
+
+
+    .filter-button .btn-filter {
+
+        width: 100%;
+
+    }
+
+
+    .cards-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+
+    .averages-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 12px;
+
+    }
+
+
+    .content {
+
+        width: 92%;
+
+    }
+
+
+    .filters-title {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+    .filters-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .filter-button {
+
+        grid-column: auto;
+
+    }
+
+
+    .cards-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .averages-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .charts-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .chart-container {
+
+        height: 280px;
+
+    }
+
+}

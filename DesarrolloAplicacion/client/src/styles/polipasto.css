@@ -1,0 +1,450 @@
+/* ============================================================
+   Control de polipasto — panel de control estilo HMI industrial
+   ============================================================ */
+
+.pol-page {
+  --pol-bg: #12161b;
+  --pol-surface: #1b2128;
+  --pol-surface-raised: #232a32;
+  --pol-border: #2b333c;
+  --pol-text: #e8ecf1;
+  --pol-text-dim: #8a94a1;
+  --pol-text-faint: #57616d;
+  --pol-green: #35d07f;
+  --pol-green-dim: rgba(53, 208, 127, 0.14);
+  --pol-red: #ef4a4a;
+  --pol-red-dim: rgba(239, 74, 74, 0.14);
+  --pol-blue: #4f8ff7;
+  --pol-font-ui: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --pol-font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px;
+  background: var(--pol-bg);
+  color: var(--pol-text);
+  font-family: var(--pol-font-ui);
+  border-radius: 16px;
+  border: 1px solid var(--pol-border);
+}
+
+.pol-page * {
+  box-sizing: border-box;
+}
+
+/* ---------- Barra superior ---------- */
+
+.pol-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--pol-border);
+}
+
+.pol-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pol-conexion {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.pol-conexion--ok {
+  background: var(--pol-green-dim);
+  color: var(--pol-green);
+}
+
+.pol-conexion--off {
+  background: var(--pol-red-dim);
+  color: var(--pol-red);
+}
+
+/* ---------- Paneles genéricos ---------- */
+
+.pol-panel {
+  background: var(--pol-surface);
+  border: 1px solid var(--pol-border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.pol-panel-title {
+  margin: 0 0 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pol-text-dim);
+}
+
+/* ---------- LEDs ---------- */
+
+.pol-led {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--pol-green);
+  box-shadow: 0 0 6px var(--pol-green);
+  flex-shrink: 0;
+}
+
+.pol-led--ok {
+  background: var(--pol-green);
+  box-shadow: 0 0 6px var(--pol-green);
+}
+
+.pol-led--fault {
+  background: var(--pol-red);
+  box-shadow: 0 0 6px var(--pol-red);
+}
+
+.pol-led--pulse {
+  animation: pol-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pol-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pol-led--pulse {
+    animation: none;
+  }
+}
+
+/* ---------- Grids de layout ---------- */
+
+.pol-grid-top {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 14px;
+  margin-bottom: 14px;
+  align-items: stretch;
+}
+
+.pol-grid-mid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+@media (max-width: 560px) {
+  .pol-grid-top,
+  .pol-grid-mid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Estado ---------- */
+
+.pol-estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: var(--pol-green-dim);
+  color: var(--pol-green);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+}
+
+.pol-estado-badge--fault {
+  background: var(--pol-red-dim);
+  color: var(--pol-red);
+}
+
+.pol-estado-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--pol-border);
+}
+
+.pol-estado-label {
+  font-size: 0.82rem;
+  color: var(--pol-text-dim);
+}
+
+.pol-estado-movimiento {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--pol-blue);
+}
+
+.pol-estado-movimiento-icono {
+  font-size: 0.8rem;
+}
+
+.pol-estado-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pol-estado-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pol-estado-metric-label {
+  font-size: 0.72rem;
+  color: var(--pol-text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pol-estado-metric-value {
+  font-family: var(--pol-font-mono);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.pol-estado-metric-unit {
+  margin-left: 3px;
+  font-size: 0.85rem;
+  color: var(--pol-text-dim);
+}
+
+/* ---------- Control (D-pad) ---------- */
+
+.pol-dpad {
+  display: grid;
+  grid-template-columns: 56px 1fr 56px;
+  grid-template-rows: 64px 76px 64px;
+  gap: 8px;
+  max-width: 280px;
+  margin: 4px auto 0;
+}
+
+.pol-dpad-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: var(--pol-surface-raised);
+  border: 1px solid var(--pol-border);
+  border-radius: 10px;
+  color: var(--pol-text);
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.pol-dpad-btn:hover {
+  border-color: var(--pol-blue);
+}
+
+.pol-dpad-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.35);
+}
+
+.pol-dpad-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pol-dpad-btn--up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.pol-dpad-btn--left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.pol-dpad-btn--right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.pol-dpad-btn--down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.pol-dpad-btn--stop {
+  grid-column: 2;
+  grid-row: 2;
+  border-radius: 50%;
+  background: var(--pol-red-dim);
+  border-color: var(--pol-red);
+  color: var(--pol-red);
+}
+
+.pol-dpad-btn--stop:hover {
+  border-color: var(--pol-red);
+  filter: brightness(1.15);
+}
+
+.pol-dpad-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.pol-dpad-text {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Velocidad ---------- */
+
+.pol-velocidad-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.pol-velocidad-value {
+  font-family: var(--pol-font-mono);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--pol-blue);
+}
+
+.pol-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  margin: 14px 0 8px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--pol-blue) 0%,
+    var(--pol-blue) var(--pol-slider-fill, 0%),
+    var(--pol-surface-raised) var(--pol-slider-fill, 0%),
+    var(--pol-surface-raised) 100%
+  );
+  cursor: pointer;
+}
+
+.pol-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--pol-text);
+  border: 3px solid var(--pol-blue);
+  cursor: pointer;
+}
+
+.pol-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--pol-text);
+  border: 3px solid var(--pol-blue);
+  cursor: pointer;
+}
+
+.pol-slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pol-velocidad-scale {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--pol-font-mono);
+  font-size: 0.72rem;
+  color: var(--pol-text-faint);
+}
+
+/* ---------- Límites / Alarmas ---------- */
+
+.pol-status-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pol-status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pol-status-label {
+  font-size: 0.85rem;
+  color: var(--pol-text);
+}
+
+/* ---------- Historial ---------- */
+
+.pol-historial-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pol-historial-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 64px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--pol-border);
+  font-size: 0.85rem;
+}
+
+.pol-historial-row:last-child {
+  border-bottom: none;
+}
+
+.pol-historial-hora {
+  font-family: var(--pol-font-mono);
+  color: var(--pol-text-dim);
+}
+
+.pol-historial-accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.pol-historial-icono {
+  color: var(--pol-blue);
+  font-size: 0.8rem;
+}
+
+.pol-historial-duracion {
+  font-family: var(--pol-font-mono);
+  text-align: right;
+  color: var(--pol-text-dim);
+}
