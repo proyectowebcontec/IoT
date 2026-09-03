@@ -1,0 +1,1 @@
+Se creó el reporte preliminar de avances en el mes de agosto
