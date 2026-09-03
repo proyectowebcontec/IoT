@@ -185,7 +185,7 @@ La actividad de comunicación no se considera finalizada, debido a que aún se e
 
 **Estado:** Parcial
 
-**Fecha de cierre:** [DD/MM/AAAA]
+**Fecha de cierre:** 20/08/2026
 
 **Pendientes:**
-[Descripción de pendientes, si existen.]
+Hizo falta comunicar variables al gateway y verificar comunicaciones por diversos medios.
