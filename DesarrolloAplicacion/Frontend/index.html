@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CONTEC IoT</title>
+
+    <link
+        rel="stylesheet"
+        href="./css/main.css"
+    >
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+        crossorigin="anonymous"
+    >
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+    <header class="header">
+        <div>
+            <div class="logo">
+                CONTEC IoT
+            </div>
+
+            <div class="header-subtitle">
+                Integración Digital
+            </div>
+        </div>
+
+        <div class="header-status">
+            <span class="status-indicator"></span>
+            Sistema de monitoreo
+        </div>
+    </header>
+
+
+    <main class="content">
+
+        <div class="page-header">
+            <div>
+                <h1>Dashboard de monitoreo</h1>
+                <p>
+                    Visualización en tiempo real de dispositivos y variables industriales.
+                </p>
+            </div>
+        </div>
+
+
+        <!-- NAVEGACIÓN -->
+        <nav class="navbar navbar-expand-lg dashboard-navbar">
+
+            <div class="container-fluid">
+
+                <a class="navbar-brand" href="#">
+                    CONTEC IoT
+                </a>
+
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNavAltMarkup"
+                    aria-controls="navbarNavAltMarkup"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+
+                <div
+                    class="collapse navbar-collapse"
+                    id="navbarNavAltMarkup"
+                >
+
+                    <div class="navbar-nav">
+
+                        <a
+                            class="nav-link active"
+                            aria-current="page"
+                            href="#"
+                        >
+                            Dashboard
+                        </a>
+
+                        <a
+                            class="nav-link"
+                            href="./pages/dispositivos.html"
+                        >
+                            Dispositivos
+                        </a>
+
+                        <a
+                            class="nav-link"
+                            href="./pages/historial.html"
+                        >
+                            Historial
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+
+        <!-- FILTROS -->
+        <section class="filters-panel">
+
+            <div class="filters-title">
+                <div>
+                    <h2>Filtros</h2>
+                    <p>
+                        Seleccione el dispositivo y período que desea consultar.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm"
+                    id="limpiar-filtros"
+                >
+                    Limpiar filtros
+                </button>
+            </div>
+
+
+            <div class="filters-grid">
+
+                <!-- DISPOSITIVO -->
+                <div class="filter-group">
+
+                    <label for="select-dispositivos">
+                        Dispositivo
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="select-dispositivos"
+                    >
+                        <option value="" selected>
+                            Todos los dispositivos
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <!-- ATAJO DE TIEMPO -->
+                <div class="filter-group">
+
+                    <label for="select-periodo">
+                        Período rápido
+                    </label>
+
+                    <select
+                        class="form-select"
+                        id="select-periodo"
+                    >
+                        <option value="" selected>
+                            Seleccione un período
+                        </option>
+
+                        <option value="1h">
+                            Última hora
+                        </option>
+
+                        <option value="6h">
+                            Últimas 6 horas
+                        </option>
+
+                        <option value="12h">
+                            Últimas 12 horas
+                        </option>
+
+                        <option value="24h">
+                            Últimas 24 horas
+                        </option>
+
+                        <option value="7d">
+                            Últimos 7 días
+                        </option>
+
+                        <option value="30d">
+                            Últimos 30 días
+                        </option>
+
+                        <option value="today">
+                            Hoy
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- FECHA INICIAL -->
+                <div class="filter-group">
+
+                    <label for="fecha-inicio">
+                        Desde
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        class="form-control"
+                        id="fecha-inicio"
+                    >
+
+                </div>
+
+
+                <!-- FECHA FINAL -->
+                <div class="filter-group">
+
+                    <label for="fecha-fin">
+                        Hasta
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        class="form-control"
+                        id="fecha-fin"
+                    >
+
+                </div>
+
+
+                <!-- BOTÓN -->
+                <div class="filter-group filter-button">
+
+                    <button
+                        type="button"
+                        class="btn-filter"
+                        id="btn-filtrar"
+                    >
+                        Aplicar filtros
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TARJETAS PRINCIPALES -->
+        <section class="cards-grid">
+
+            <div class="metric-card blue-card">
+
+                <div class="metric-card-header">
+                    <span>Dispositivos</span>
+                </div>
+
+                <div
+                    class="metric-value"
+                    id="no_dispositivos"
+                >
+                    ----
+                </div>
+
+                <div class="metric-description">
+                    Dispositivos registrados
+                </div>
+
+            </div>
+
+
+            <div class="metric-card orange-card">
+
+                <div class="metric-card-header">
+                    <span>Variables</span>
+                </div>
+
+                <div class="metric-value">
+                    4
+                </div>
+
+                <div class="metric-description">
+                    Variables monitoreadas
+                </div>
+
+            </div>
+
+
+            <div class="metric-card yellow-card">
+
+                <div class="metric-card-header">
+                    <span>Registros</span>
+                </div>
+
+                <div
+                    class="metric-value"
+                    id="conteo-registros"
+                >
+                    ----
+                </div>
+
+                <div class="metric-description">
+                    Registros encontrados
+                </div>
+
+            </div>
+
+
+            <div class="metric-card gray-card">
+
+                <div class="metric-card-header">
+                    <span>Pulsaciones</span>
+                </div>
+
+                <div
+                    class="metric-value"
+                    id="conteo-pulsaciones"
+                >
+                    ----
+                </div>
+
+                <div class="metric-description">
+                    Pulsaciones registradas
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PROMEDIOS -->
+        <section class="section-block">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>Promedios de variables</h2>
+                    <p>
+                        Valores promedio para el período seleccionado.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="averages-grid">
+
+                <div class="average-card">
+
+                    <div class="average-icon average-blue">
+                        V1
+                    </div>
+
+                    <div>
+
+                        <div class="average-label">
+                            Promedio Variable 1
+                        </div>
+
+                        <div
+                            class="average-value"
+                            id="promedio-variable-1"
+                        >
+                            ----
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="average-card">
+
+                    <div class="average-icon average-orange">
+                        V2
+                    </div>
+
+                    <div>
+
+                        <div class="average-label">
+                            Promedio Variable 2
+                        </div>
+
+                        <div
+                            class="average-value"
+                            id="promedio-variable-2"
+                        >
+                            ----
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="average-card">
+
+                    <div class="average-icon average-yellow">
+                        V3
+                    </div>
+
+                    <div>
+
+                        <div class="average-label">
+                            Promedio Variable 3
+                        </div>
+
+                        <div
+                            class="average-value"
+                            id="promedio-variable-3"
+                        >
+                            ----
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="average-card">
+
+                    <div class="average-icon average-gray">
+                        V4
+                    </div>
+
+                    <div>
+
+                        <div class="average-label">
+                            Promedio Variable 4
+                        </div>
+
+                        <div
+                            class="average-value"
+                            id="promedio-variable-4"
+                        >
+                            ----
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- GRÁFICAS -->
+        <section class="section-block">
+
+            <div class="section-header">
+                <div>
+                    <h2>Comportamiento de variables</h2>
+                    <p>
+                        Tendencias obtenidas de los dispositivos seleccionados.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="charts-grid">
+
+                <div class="chart-card">
+
+                    <div class="chart-header">
+                        <div>
+                            <h3>Variable principal</h3>
+                            <p>Comportamiento histórico</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="myChart"></canvas>
+                    </div>
+
+                </div>
+
+
+                <div class="chart-card">
+
+                    <div class="chart-header">
+                        <div>
+                            <h3>Pulsaciones</h3>
+                            <p>Eventos registrados</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="PulsacionesChart"></canvas>
+                    </div>
+
+                </div>
+
+
+                <div class="chart-card">
+
+                    <div class="chart-header">
+                        <div>
+                            <h3>Voltaje X</h3>
+                            <p>Lecturas de entrada analógica</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="VoltajeX"></canvas>
+                    </div>
+
+                </div>
+
+
+                <div class="chart-card">
+
+                    <div class="chart-header">
+                        <div>
+                            <h3>Voltaje Y</h3>
+                            <p>Lecturas de entrada analógica</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="VoltajeY"></canvas>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous">
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js">
+    </script>
+
+    <script src="./js/api.js"></script>
+
+</body>
+
+</html>
