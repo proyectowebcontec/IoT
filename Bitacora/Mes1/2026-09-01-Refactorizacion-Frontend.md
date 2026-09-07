@@ -86,7 +86,43 @@ Exitoso
 ### Datos relevantes
 
 ```text
-[Placeholder — completar si aplica, por ejemplo estructura final de componentes]
+ProyectoIoT/
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── AveragesGrid.jsx
+│   │   │   ├── ChartsGrid.jsx
+│   │   │   ├── DashboardNavbar.jsx
+│   │   │   ├── FiltersPanel.jsx
+│   │   │   ├── Header.jsx
+│   │   │   ├── MetricCards.jsx
+│   │   │   └── FiltersPanel.jsx
+│   │   │
+│   │   ├── pages/
+│   │   │   └─── Dashboard.jsx
+│   │   │
+│   │   ├── services/
+│   │   │   ├── api.js
+│   │   │   └── websocket.js
+│   │   │
+│   │   ├── hooks/
+│   │   │   └── useChart.js
+│   │   │
+│   │   ├── service/
+│   │   │   ├── Service.js
+│   │   │   └── connection/
+|   │   │       └── connection.js
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   └── index.css
+│   │
+│   ├── package.json
+│   └── vite.config.js
+│
+├── docker-compose.yml
+└── README.md
 ```
 
 ---
