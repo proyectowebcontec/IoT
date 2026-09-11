@@ -87,39 +87,43 @@ export default function Dashboard() {
     if (filtros.dispositivoId === "") return;
 
     try {
+      // Actualizar cantidad de registros
+      const noMonitoreos = await Service.obtenerNoMonitoreos();
+
       //Conteo de pulsaciones
       const noPulsaciones = await Service.obtenerConteoPulsacionesTR(filtros.dispositivoId, "DI3");
       //console.log(noPulsaciones)
       setMetrics(prev => ({
         ...prev,
+        registros: noMonitoreos.total_monitoreos,
         pulsaciones: noPulsaciones.total
       }));
 
       // Obener los promedios de las variables observadas
-      const avgEntradaU6 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U6")
-      const avgEntradaU7 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U7")
-      const avgEntradaU8 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U8")
-      //console.log(avgEntradaU6)
+      const avgEntradaU1 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U1")
+      const avgEntradaU2 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U2")
+      const avgEntradaU3 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U3")
+      //console.log(avgEntradaU1)
 
       setAverages({
-        v1: avgEntradaU6.promedio ? avgEntradaU6.promedio.toFixed(4) : undefined,
-        v2: avgEntradaU7.promedio ? avgEntradaU7.promedio.toFixed(4) : undefined, 
-        v3: avgEntradaU8.promedio ? avgEntradaU8.promedio.toFixed(4) : undefined})
+        v1: avgEntradaU1.promedio ? avgEntradaU1.promedio.toFixed(4) : undefined,
+        v2: avgEntradaU2.promedio ? avgEntradaU2.promedio.toFixed(4) : undefined, 
+        v3: avgEntradaU3.promedio ? avgEntradaU3.promedio.toFixed(4) : undefined})
 
       // Gráficos     
-      const dataU6 = await Service.obtenerDashboardTR(
+      const dataU1 = await Service.obtenerDashboardTR(
         filtros.dispositivoId,
-        "U6"
+        "U1"
       );
 
-      const dataU7 = await Service.obtenerDashboardTR(
+      const dataU2 = await Service.obtenerDashboardTR(
         filtros.dispositivoId,
-        "U7"
+        "U2"
       );
 
-      const dataU8 = await Service.obtenerDashboardTR(
+      const dataU3 = await Service.obtenerDashboardTR(
         filtros.dispositivoId,
-        "U8"
+        "U3"
       );
 
       const dataDI3 = await Service.obtenerDashboardTR(
@@ -127,20 +131,20 @@ export default function Dashboard() {
         "DI3"
       );
 
-      const medicionesU6 = extraerDatos(dataU6);
-      const medicionesU7 = extraerDatos(dataU7);
-      const medicionesU8 = extraerDatos(dataU8);
+      const medicionesU1 = extraerDatos(dataU1);
+      const medicionesU2 = extraerDatos(dataU2);
+      const medicionesU3 = extraerDatos(dataU3);
       const medicionesDI3 = extraerDatos(dataDI3);
 
       setChartData({
         principal: {
           type: "line",
           data: {
-            labels: medicionesU6.fechas,
+            labels: medicionesU1.fechas,
             datasets: [
               {
-                label: "U6",
-                data: medicionesU6.valores,
+                label: "U1",
+                data: medicionesU1.valores,
               },
             ],
           },
@@ -162,11 +166,11 @@ export default function Dashboard() {
         voltajeX: {
           type: "line",
           data: {
-            labels: medicionesU7.fechas,
+            labels: medicionesU2.fechas,
             datasets: [
               {
-                label: "U7",
-                data: medicionesU7.valores,
+                label: "U2",
+                data: medicionesU2.valores,
               },
             ],
           },
@@ -175,11 +179,11 @@ export default function Dashboard() {
         voltajeY: {
           type: "line",
           data: {
-            labels: medicionesU8.fechas,
+            labels: medicionesU3.fechas,
             datasets: [
               {
-                label: "U8",
-                data: medicionesU8.valores,
+                label: "U3",
+                data: medicionesU3.valores,
               },
             ],
           },
@@ -263,25 +267,25 @@ export default function Dashboard() {
       }));
 
       // Obener los promedios de las variables observadas
-      const avgEntradaU6 = await Service.obtenerPromedioVariable(filtros.dispositivoId, "U6", filtros.fechaInicio, filtros.fechaFin)
-      const avgEntradaU7 = await Service.obtenerPromedioVariable(filtros.dispositivoId, "U7", filtros.fechaInicio, filtros.fechaFin)
-      const avgEntradaU8 = await Service.obtenerPromedioVariable(filtros.dispositivoId, "U8", filtros.fechaInicio, filtros.fechaFin)
-      //console.log(avgEntradaU6)
+      const avgEntradaU1 = await Service.obtenerPromedioVariable(filtros.dispositivoId, "U1", filtros.fechaInicio, filtros.fechaFin)
+      const avgEntradaU2 = await Service.obtenerPromedioVariable(filtros.dispositivoId, "U2", filtros.fechaInicio, filtros.fechaFin)
+      const avgEntradaU3 = await Service.obtenerPromedioVariable(filtros.dispositivoId, "U3", filtros.fechaInicio, filtros.fechaFin)
+      //console.log(avgEntradaU1)
 
       setAverages({
-        v1: avgEntradaU6.promedio ? avgEntradaU6.promedio.toFixed(4) : undefined,
-        v2: avgEntradaU7.promedio ? avgEntradaU7.promedio.toFixed(4) : undefined, 
-        v3: avgEntradaU8.promedio ? avgEntradaU8.promedio.toFixed(4) : undefined})
+        v1: avgEntradaU1.promedio ? avgEntradaU1.promedio.toFixed(4) : undefined,
+        v2: avgEntradaU2.promedio ? avgEntradaU2.promedio.toFixed(4) : undefined, 
+        v3: avgEntradaU3.promedio ? avgEntradaU3.promedio.toFixed(4) : undefined})
 
       // Gráficos
-      const dataU6 = await Service.obtenerDashboard(filtros.dispositivoId, "U6", filtros.fechaInicio, filtros.fechaFin)
-      const medicionesU6 = extraerDatos(dataU6);
+      const dataU1 = await Service.obtenerDashboard(filtros.dispositivoId, "U1", filtros.fechaInicio, filtros.fechaFin)
+      const medicionesU1 = extraerDatos(dataU1);
       
-      const dataU7 = await Service.obtenerDashboard(filtros.dispositivoId, "U7", filtros.fechaInicio, filtros.fechaFin)
-      const medicionesU7 = extraerDatos(dataU7);
+      const dataU2 = await Service.obtenerDashboard(filtros.dispositivoId, "U2", filtros.fechaInicio, filtros.fechaFin)
+      const medicionesU2 = extraerDatos(dataU2);
       
-      const dataU8 = await Service.obtenerDashboard(filtros.dispositivoId, "U8", filtros.fechaInicio, filtros.fechaFin)
-      const medicionesU8 = extraerDatos(dataU8);
+      const dataU3 = await Service.obtenerDashboard(filtros.dispositivoId, "U3", filtros.fechaInicio, filtros.fechaFin)
+      const medicionesU3 = extraerDatos(dataU3);
       
       const dataDI3 = await Service.obtenerDashboard(filtros.dispositivoId, "DI3", filtros.fechaInicio, filtros.fechaFin)
       const medicionesDI3 = extraerDatos(dataDI3);
@@ -290,11 +294,11 @@ export default function Dashboard() {
         principal: {
           type: "line",
           data: {
-            labels: medicionesU6.fechas,
+            labels: medicionesU1.fechas,
             datasets: [
               {
-                label: "U6",
-                data: medicionesU6.valores,
+                label: "U1",
+                data: medicionesU1.valores,
               }
             ]
           }
@@ -316,11 +320,11 @@ export default function Dashboard() {
         voltajeX: {
           type: "line",
           data: {
-            labels: medicionesU7.fechas,
+            labels: medicionesU2.fechas,
             datasets: [
               {
-                label: "U7",
-                data: medicionesU7.valores,
+                label: "U2",
+                data: medicionesU2.valores,
               }
             ]
           }
@@ -329,11 +333,11 @@ export default function Dashboard() {
         voltajeY: {
           type: "line",
           data: {
-            labels: medicionesU8.fechas,
+            labels: medicionesU3.fechas,
             datasets: [
               {
-                label: "U8",
-                data: medicionesU8.valores,
+                label: "U3",
+                data: medicionesU3.valores,
               }
             ]
           }
