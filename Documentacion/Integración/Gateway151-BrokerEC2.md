@@ -556,6 +556,9 @@ Durante la implementación ocurrieron los siguientes inconvenientes:
 | Mensajes MQTT             | Mensajes recibidos en `test/mqtt`                             |
 | Broker EC2                | Evidencia de recepción de mensajes                            |
 
+### Adicional
+[Configuraci+on del broker](./imgs/Conexion_broker/Configuracion_mosquitto.png)
+
 ---
 
 ## 18. Conclusión
