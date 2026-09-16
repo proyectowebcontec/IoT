@@ -39,7 +39,7 @@ Leer la corriente empleada por el motor, comunicarla al PLC y posteriormente al 
 | Donas de corriente | 100/5 AMP. 30I | — | Capturar la señal de corriente en las fases del motor |
 | Transductores de corriente | RMS 85-26 | — | Convertir la señal capturada por las donas en una señal utilizable por el PLC |
 | Potenciómetro | 5k | — | Simular una entrada analógica directa al PLC para pruebas |
-| PLC | PLC Siemens LOGO! | — | Recibir y procesar las señales analógicas de corriente |
+| PLC | PLC Siemens LOGO! 8 | — | Recibir y procesar las señales analógicas de corriente |
 | Computadora de escritorio | core i5 | — | Programación definitiva del PLC |
 | Gateway industrial | GAOTek WHG-151 | — | Candidato para publicar a internet la lectura de corriente, pendiente de solución técnica |
 | Control de velocidad | -- | — | Modificar la velocidad de trabajo del motor |
@@ -51,7 +51,7 @@ Leer la corriente empleada por el motor, comunicarla al PLC y posteriormente al 
 ### Hardware
 
 * **Equipo:** Motor, donas de corriente, transductores de corriente, PLC
-* **Modelo:** [Placeholder — completar]
+* **Modelo:** _, 100/5 AMP. 30I, RMS 85-26, PLC Siemens LOGO! 8 
 * **Alimentación:** 440VAC, _, 110V, 24V
 * **Conexiones:** Donas de corriente → transductores → entradas analógicas del PLC; potenciómetro conectado como entrada analógica alternativa para pruebas
 
@@ -168,9 +168,11 @@ Pendiente; el problema no ha sido resuelto a la fecha.
 
 | Evidencia | Descripción | Ubicación |
 | --------- | ------------ | --------- |
-| Error en el transductor |  | Al intentar leer el valor desde el gateway |
+| Error en el transductor | Al intentar leer el valor desde el gateway | ./imgs/ConexionPLC/ErrorTransductor.jpeg |
 | Tablero prelimianar armado completamente | Se montó en el taller un circuito con la disposición final del tablero para emplearlo en las pruebas | ./imgs/ConexionPLC/TableroPreliminar.jpeg |
-| Fotografía 01 | [Descripción] | [Ruta del archivo] |
+
+* [Error en el transductor](./imgs/ConexionPLC/ErrorTransductor.jpeg)
+* [ablero prelimianar armado completamente](./imgs/ConexionPLC/TableroPreliminar.jpeg)
 
 ---
 
