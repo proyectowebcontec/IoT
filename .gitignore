@@ -1,0 +1,22 @@
+.vscode
+ManualesDeLosComponentes/
+tmp/
+Guia_reunion_tecnica_integracion_industrial.docx
+Informe_preliminar_avances_15_dias.md
+Plan_3_Meses_Katherine_IoT.xlsx
+
+Documentacion/Pruebas/Screenshot 2026-08-26 152520.png
+Documentacion/Pruebas/imgs/acceso_administracion/desktop.ini
+Documentacion/Inventario/Inventario.md
+
+Documentacion/Integración/imgs/desktop.ini
+DesarrolloAplicacion/Backend/__pycache__
+DesarrolloAplicacion/Backend/app/__pycache__
+DesarrolloAplicacion/Backend/app/api/__pycache__
+DesarrolloAplicacion/Backend/app/api/routes/__pycache__
+DesarrolloAplicacion/Backend/app/database/__pycache__
+
+DesarrolloAplicacion/Backend/.env
+
+DesarrolloAplicacion/Frontend/pages
+DesarrolloAplicacion/Frontend/js/components

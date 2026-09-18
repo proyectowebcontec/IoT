@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from models.errores import RecursoNoEncontradoError, manejar_recurso_no_encontrado
 from api.routes.monitoreos import router as monitoreos_router
 from api.routes.dispositivos import router as dispositivos_router
 from api.routes.dashboard import router as dashboard_router
@@ -21,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def read_root():
     return {
@@ -32,6 +34,10 @@ def read_root():
 def read_item(item_id: int, q: str | None = None):
     return {"item_id": item_id, "q": q}
 
+# --------------------------------------------------
+# Manejo de errores
+# --------------------------------------------------
+app.add_exception_handler(RecursoNoEncontradoError, manejar_recurso_no_encontrado)
 
 app.include_router(monitoreos_router)
 app.include_router(dispositivos_router)

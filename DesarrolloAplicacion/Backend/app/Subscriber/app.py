@@ -2,11 +2,15 @@ import paho.mqtt.client as mqtt
 import time
 import sys
 import json
-import config as config
 from datetime import datetime
 from uuid import uuid4
 
+from pydantic import ValidationError
 from pymongo import MongoClient
+from .configure import BROKER, PORT, TOPIC, CLIENT_ID, MONGO_URI, DATABASE_NAME, COLLECTION_NAME
+
+from ..schemas.gateway151 import GatewayData
+from ..schemas.monitoreo import Medicion, Monitoreo
 
 ID_DISPOSITIVO = "WHG-151-001"
 
@@ -58,21 +62,21 @@ DESCRIPCIONES = {
 
 # MONGODB
 def get_db_connection():
-    mongo_client = MongoClient(config.MONGO_URI)
-    db = mongo_client[config.DATABASE_NAME]
-    collection = db[config.COLLECTION_NAME]
+    mongo_client = MongoClient(MONGO_URI)
+    db = mongo_client[DATABASE_NAME]
+    collection = db[COLLECTION_NAME]
 
     return collection
 
 # Save meassures
-def guardar_monitoreo(data):
+def guardar_monitoreo(data: GatewayData):
 
     # --------------------------------------
     # Timestamp del gateway
     # --------------------------------------
 
     fecha_gateway = datetime.strptime(
-        data["times"],
+        data.times,
         "%Y-%m-%d %H:%M:%S"
     )
 
@@ -89,83 +93,89 @@ def guardar_monitoreo(data):
     mediciones = []
 
     for indice, sensor in enumerate(
-        data["sensorDatas"],
+        data.sensorDatas,
         start=1
     ):
 
-        entrada = sensor["flag"]
+        entrada = sensor.flag
 
-        if "value" in sensor:
-            valor = sensor["value"]
+        if sensor.value is not None:
+            valor = sensor.value
 
-        elif "switcher" in sensor:
-            valor = sensor["switcher"]
+        elif sensor.switcher is not None:
+            valor = sensor.switcher
 
         else:
-            valor = None
+            # Sin valor útil: se descarta esta lectura
+            continue
 
-        mediciones.append({
-            "IdMedicion": indice,
-            "descripcion": DESCRIPCIONES.get(
-                entrada,
-                f"Entrada {entrada}"
-            ),
-            "entrada": entrada,
-            "valor": valor
-        })
+        mediciones.append(
+            Medicion(
+                IdMedicion=indice,
+                descripcion=DESCRIPCIONES.get(
+                    entrada,
+                    f"Entrada {entrada}"
+                ),
+                entrada=entrada,
+                valor=valor
+            )
+        )
 
     # --------------------------------------
     # Documento
     # --------------------------------------
 
-    documento = {
-
-        "IDMonitoreo": str(uuid4()),
-
-        "IDDispositivo": ID_DISPOSITIVO,
-
-        "FechaMonitoreo": fecha_gateway,
-
-        "FechaCargaDB": fecha_carga,
-
-        "Mediciones": mediciones
-    }
+    monitoreo = Monitoreo(
+        IDMonitoreo=str(uuid4()),
+        IDDispositivo=ID_DISPOSITIVO,
+        FechaMonitoreo=fecha_gateway,
+        FechaCargaDB=fecha_carga,
+        Mediciones=mediciones
+    )
 
     # --------------------------------------
     # Guardar
     # --------------------------------------
     collection = get_db_connection()
 
-    collection.insert_one(documento)
+    collection.insert_one(monitoreo.model_dump())
 
     print(
         f"Monitoreo almacenado: "
-        f"{documento['IDMonitoreo']}"
+        f"{monitoreo.IDMonitoreo}"
     )
 
 # Callback when the client connect to the broker
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected to MQTT Broker!")
-        client.subscribe(config.TOPIC)
+        client.subscribe(TOPIC)
     else:
         print(f"Failed to connect, return codem {rc}")
 
 # Callback when a message is received from the broker
-def on_message(client, userdata, msg):
+def on_message(msg):
     str_msg = msg.payload.decode()
     #print(f"Received message: {str_msg} on topic {config.TOPIC}")
-    #print(type(msg.payload.decode()))
 
     try:
         # Parse JSON string into Python object
         json_msg = json.loads(str_msg)
-        #print(json_msg["times"])
-        #print(json_msg["sensorDatas"][1])
-
-        guardar_monitoreo(json_msg)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON string: {e}")
+        print(f"JSON inválido, se descarta el mensaje: {e}")
+        return
+
+    try:
+        # Validar la estructura del mensaje contra el esquema del gateway
+        gateway_data = GatewayData(**json_msg)
+    except ValidationError as e:
+        print(f"Mensaje con esquema inválido, se descarta: {e}")
+        return
+
+    try:
+        guardar_monitoreo(gateway_data)
+    except Exception as e:
+        print(f"Error al guardar monitoreo: {e}")
 
 # Callback when the client disconnects
 def on_disconnet(client, userdata, rc):
@@ -173,14 +183,14 @@ def on_disconnet(client, userdata, rc):
 
 def main():
     try:
-        client = mqtt.Client(client_id=config.CLIENT_ID, clean_session=True)
+        client = mqtt.Client(client_id=CLIENT_ID, clean_session=True)
 
         client.on_connect = on_connect
         client.on_message = on_message
         client.on_disconnect = on_disconnet
 
         # Connect to broker
-        client.connect(config.BROKER, config.PORT, keepalive=60)
+        client.connect(BROKER, PORT, keepalive=60)
 
         client.loop_start()
 
@@ -199,4 +209,5 @@ def main():
         client.disconnect()
 
 if __name__ == "__main__":
+    
     main()
