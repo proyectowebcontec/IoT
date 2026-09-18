@@ -1,0 +1,1 @@
+Se finalizaron las bitácoras del primer mes y con la nueva versión del software compartido por Sherlyn se intentó configurar el internet por medio de la tarjeta sim al gateway 206 sin éxito, se probaron múltiples configuraciones.

@@ -1,0 +1,2 @@
+configuraciones de red del gateway 206, conexión a internet por medio de un router, queda pendiente la conexión por medio de la SIM
+se comenzó la refactorización del backend agregando validaciones de datos por medio de esquemas y estandarización de mensajes de error
