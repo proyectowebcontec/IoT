@@ -14,6 +14,9 @@ DesarrolloAplicacion/Backend/__pycache__
 DesarrolloAplicacion/Backend/app/__pycache__
 DesarrolloAplicacion/Backend/app/api/__pycache__
 DesarrolloAplicacion/Backend/app/api/routes/__pycache__
+DesarrolloAplicacion/Backend/app/models/__pycache__/
+DesarrolloAplicacion/Backend/app/schemas/__pycache__/
+DesarrolloAplicacion/Backend/app/utils/__pycache__
 DesarrolloAplicacion/Backend/app/database/__pycache__
 
 DesarrolloAplicacion/Backend/.env
