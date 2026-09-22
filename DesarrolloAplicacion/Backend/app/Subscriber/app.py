@@ -100,7 +100,8 @@ def guardar_monitoreo(data: GatewayData):
         entrada = sensor.flag
 
         if sensor.value is not None:
-            valor = sensor.value
+            float_value = float(sensor.value)
+            valor = ((float_value - 0.8)(2.1)/0.28)+6.2
 
         elif sensor.switcher is not None:
             valor = sensor.switcher
