@@ -34,7 +34,7 @@
 
 ## 4. Arquitectura
 
-[Ver documentación](./04-arquitectura.md)
+[Ver documentación](./Arquitectura/arquitectura.md)
 
 ## 5. Inventario de equipo
 
@@ -42,19 +42,21 @@
 
 ## 6. Integración
 
-[Ver documentación](./06-integracion.md)
+[Ver documentación](./Integración/README.md)
 
 ## 7. Pruebas realizadas
 
-[Ver documentación](./07-pruebas-realizadas.md)
+[Ver documentación](./Pruebas/README.md)
 
 ## 8. Análisis de resultados
 
 [Ver documentación](./08-analisis-de-resultados.md)
+> Próximamente
 
 ## 9. Recomendaciones
 
 [Ver documentación](./09-recomendaciones.md)
+>Próximamente
 
 ---
 
