@@ -31,8 +31,8 @@ Las actividades se encuentran organizadas por la evolución en la integración:
 | Establecer la comunicación de señales capturadas por un arduino  Mega 2560 hacia la Nube de AWS utilizando AWS IoT Core como Broker. | [Ver documentación](./PythonGateway-AWSIoTCore.md) |
 | Establecer la lectura de una variable digital proveniente del arduino Mega 2560 por medio del gateway GAOTek WHG 151 | [Ver documentación](./Arduino2560-Gateway151-Digital.md) |
 | Establecer la lectura de una variables analógicas proveniente de distintos sensores por medio del gateway GAOTek WHG 151 | [Ver documentación](./Gateway151-LecturaAnalogica.md) |
-| [Descripción breve de la actividad] | [Ver documentación](./AAAA-MM-DD-nombre-actividad.md) |
-| [Descripción breve de la actividad] | [Ver documentación](./AAAA-MM-DD-nombre-actividad.md) |
+| Integración del Gateway WHG-151 al Broker MQTT en AWS EC2 | [Ver documentación](./Gateway151-BrokerEC2.md) |
+| Integración del Gateway WHG-151 al Broker MQTT en AWS EC2 V2 | [Ver documentación](./Gateway151-BrokerEC2_V2.md) |
 | [Descripción breve de la actividad] | [Ver documentación](./AAAA-MM-DD-nombre-actividad.md) |
 
 ---
