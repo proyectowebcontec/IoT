@@ -99,9 +99,14 @@ def guardar_monitoreo(data: GatewayData):
 
         entrada = sensor.flag
 
+        ENTRADAS_CONVERTIR = {f"U{i}" for i in range(1, 9)}
+        
         if sensor.value is not None:
             float_value = float(sensor.value)
-            valor = ((float_value - 0.8)(2.1)/0.28)+6.2
+            if entrada in ENTRADAS_CONVERTIR:
+                valor = ((float_value - 0.8) * 2.1 / 0.28) + 6.2
+            else:
+                valor = float_value
 
         elif sensor.switcher is not None:
             valor = sensor.switcher
@@ -155,7 +160,7 @@ def on_connect(client, userdata, flags, rc):
         print(f"Failed to connect, return codem {rc}")
 
 # Callback when a message is received from the broker
-def on_message(msg):
+def on_message(client, userdata, msg):
     str_msg = msg.payload.decode()
     #print(f"Received message: {str_msg} on topic {config.TOPIC}")
 
