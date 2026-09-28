@@ -1,0 +1,78 @@
+/* Variantes de color y piezas nuevas para la
+   página de Dispositivos que el resto del dashboard todavía no usa. */
+
+/* ---- Variantes de color para metric-card (Conectados / Desconectados) ---- */
+
+.metric-card.green-card {
+  border-left: 4px solid #2ecc71;
+}
+
+.metric-card.green-card .metric-value {
+  color: #1e9e5a;
+}
+
+.metric-card.red-card {
+  border-left: 4px solid #e74c3c;
+}
+
+.metric-card.red-card .metric-value {
+  color: #c0392b;
+}
+
+/* cards-grid ya viene de main.css (4 columnas); acá solo se ajusta a 3 */
+.cards-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .cards-grid--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* filters-grid con 2 columnas en vez del layout de 5 del panel de filtros del Dashboard */
+.filters-grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 640px) {
+  .filters-grid--2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Badge de estado conectado/desconectado ---- */
+
+.device-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.device-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.device-status--online {
+  background: rgba(46, 204, 113, 0.12);
+  color: #1e9e5a;
+}
+
+.device-status--online .device-status-dot {
+  background: #2ecc71;
+}
+
+.device-status--offline {
+  background: rgba(231, 76, 60, 0.12);
+  color: #c0392b;
+}
+
+.device-status--offline .device-status-dot {
+  background: #e74c3c;
+}
