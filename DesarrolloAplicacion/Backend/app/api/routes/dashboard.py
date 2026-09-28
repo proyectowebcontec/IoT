@@ -1,4 +1,9 @@
 from fastapi import APIRouter
+from utils.validaciones import _validar_rango_fechas
+from schemas.medicionpunto import MedicionPunto
+from schemas.responses import PulsosResponse, PromedioResponse
+from models.errores import RecursoNoEncontradoError
+from models.entradasensor import EntradaSensor
 from database.mongodb import monitoreos_collection
 from datetime import datetime
 
@@ -9,8 +14,8 @@ router = APIRouter(
 )
 
 
-@router.get("/mediciones/{id_dispositivo}/{entrada}")
-def obtener_historial_entrada(id_dispositivo: str, entrada: str):
+@router.get("/mediciones/{id_dispositivo}/{entrada}", response_model=list[MedicionPunto])
+def obtener_historial_entrada(id_dispositivo: str, entrada: EntradaSensor):
 
     mediciones = list(
         monitoreos_collection.aggregate([
@@ -24,7 +29,7 @@ def obtener_historial_entrada(id_dispositivo: str, entrada: str):
             },
             {
                 "$match": {
-                    "Mediciones.entrada": entrada
+                    "Mediciones.entrada": entrada.value
                 }
             },
             {
@@ -50,10 +55,17 @@ def obtener_historial_entrada(id_dispositivo: str, entrada: str):
         ])
     )
 
+    if not mediciones:
+        raise RecursoNoEncontradoError(
+            f"No hay mediciones de '{entrada.value}' para el dispositivo '{id_dispositivo}'"
+        )
+
     return mediciones
 
-@router.get("/mediciones/{id_dispositivo}/{entrada}/{f_inicio}/{f_fin}")
-def obtener_mediciones_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio: datetime, f_fin: datetime):
+@router.get("/mediciones/{id_dispositivo}/{entrada}/{f_inicio}/{f_fin}", response_model=list[MedicionPunto])
+def obtener_mediciones_entrada_fecha(id_dispositivo: str, entrada: EntradaSensor, f_inicio: datetime, f_fin: datetime):
+
+    _validar_rango_fechas(f_inicio, f_fin)
 
     mediciones = list(
         monitoreos_collection.aggregate([
@@ -71,7 +83,7 @@ def obtener_mediciones_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio
             },
             {
                 "$match": {
-                    "Mediciones.entrada": entrada
+                    "Mediciones.entrada": entrada.value
                 }
             },
             {
@@ -89,11 +101,16 @@ def obtener_mediciones_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio
         ])
     )
 
+    if not mediciones:
+        raise RecursoNoEncontradoError(
+            f"No hay mediciones de '{entrada.value}' para el dispositivo '{id_dispositivo}' en el rango de fechas `{f_inicio}`-`{f_fin}`."
+        )
+
     return mediciones
 
 
-@router.get("/promedio/{id_dispositivo}/{entrada}")
-def obtener_promedio_entrada(id_dispositivo: str, entrada: str):
+@router.get("/promedio/{id_dispositivo}/{entrada}", response_model=PromedioResponse)
+def obtener_promedio_entrada(id_dispositivo: str, entrada: EntradaSensor):
 
     resultado = list(
         monitoreos_collection.aggregate([
@@ -107,7 +124,7 @@ def obtener_promedio_entrada(id_dispositivo: str, entrada: str):
             },
             {
                 "$match": {
-                    "Mediciones.entrada": entrada
+                    "Mediciones.entrada": entrada.value
                 }
             },
             {
@@ -128,20 +145,21 @@ def obtener_promedio_entrada(id_dispositivo: str, entrada: str):
     )
 
     if not resultado:
-        return {
-            "IDDispositivo": id_dispositivo,
-            "entrada": entrada,
-            "promedio": None
-        }
+            raise RecursoNoEncontradoError(
+                f"No hay mediciones de '{entrada.value}' "
+                f"para el dispositivo '{id_dispositivo}'"
+            )
 
-    return {
-        "IDDispositivo": id_dispositivo,
-        "entrada": entrada,
-        "promedio": resultado[0]["promedio"]
-    }
+    return PromedioResponse(
+        IDDispositivo=id_dispositivo,
+        entrada=entrada,
+        promedio=resultado[0]["promedio"]
+    )
 
-@router.get("/promedio/{id_dispositivo}/{entrada}/{f_inicio}/{f_fin}")
-def obtener_promedio_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio: datetime, f_fin: datetime):
+@router.get("/promedio/{id_dispositivo}/{entrada}/{f_inicio}/{f_fin}", response_model=PromedioResponse)
+def obtener_promedio_entrada_fecha(id_dispositivo: str, entrada: EntradaSensor, f_inicio: datetime, f_fin: datetime):
+
+    _validar_rango_fechas(f_inicio, f_fin)
 
     resultado = list(
         monitoreos_collection.aggregate([
@@ -159,7 +177,7 @@ def obtener_promedio_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio: 
             },
             {
                 "$match": {
-                    "Mediciones.entrada": entrada
+                    "Mediciones.entrada": entrada.value
                 }
             },
             {
@@ -180,20 +198,19 @@ def obtener_promedio_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio: 
     )
 
     if not resultado:
-        return {
-            "IDDispositivo": id_dispositivo,
-            "entrada": entrada,
-            "promedio": None
-        }
+        raise RecursoNoEncontradoError(
+            f"No hay mediciones de '{entrada.value}' "
+            f"para el dispositivo '{id_dispositivo}'"
+        )
 
-    return {
-        "IDDispositivo": id_dispositivo,
-        "entrada": entrada,
-        "promedio": resultado[0]["promedio"]
-    }
+    return PromedioResponse(
+        IDDispositivo=id_dispositivo,
+        entrada=entrada,
+        promedio=resultado[0]["promedio"]
+    )
 
-@router.get("/pulsos/{id_dispositivo}/{entrada}")
-def obtener_pulsos_entrada(id_dispositivo: str, entrada: str):
+@router.get("/pulsos/{id_dispositivo}/{entrada}", response_model=PulsosResponse)
+def obtener_pulsos_entrada(id_dispositivo: str, entrada: EntradaSensor):
 
     resultado = list(
         monitoreos_collection.aggregate([
@@ -207,7 +224,7 @@ def obtener_pulsos_entrada(id_dispositivo: str, entrada: str):
             },
             {
                 "$match": {
-                    "Mediciones.entrada": entrada
+                    "Mediciones.entrada": entrada.value
                 }
             },
             {
@@ -228,20 +245,21 @@ def obtener_pulsos_entrada(id_dispositivo: str, entrada: str):
     )
 
     if not resultado:
-        return {
-            "IDDispositivo": id_dispositivo,
-            "entrada": entrada,
-            "total": None
-        }
+        raise RecursoNoEncontradoError(
+            f"No hay pulsos de '{entrada.value}' "
+            f"para el dispositivo '{id_dispositivo}'"
+        )
 
-    return {
-        "IDDispositivo": id_dispositivo,
-        "entrada": entrada,
-        "total": resultado[0]["conteo_pulsaciones"]
-    }
+    return PulsosResponse(
+        IDDispositivo=id_dispositivo,
+        entrada=entrada,
+        total=resultado[0]["conteo_pulsaciones"]
+    )
 
-@router.get("/pulsos/{id_dispositivo}/{entrada}/{f_inicio}/{f_fin}")
-def obtener_pulsos_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio: datetime, f_fin: datetime):
+@router.get("/pulsos/{id_dispositivo}/{entrada}/{f_inicio}/{f_fin}", response_model=PulsosResponse)
+def obtener_pulsos_entrada_fecha(id_dispositivo: str, entrada: EntradaSensor, f_inicio: datetime, f_fin: datetime):
+
+    _validar_rango_fechas(f_fin, f_fin)
 
     resultado = list(
         monitoreos_collection.aggregate([
@@ -259,7 +277,7 @@ def obtener_pulsos_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio: da
             },
             {
                 "$match": {
-                    "Mediciones.entrada": entrada
+                    "Mediciones.entrada": entrada.value
                 }
             },
             {
@@ -280,14 +298,14 @@ def obtener_pulsos_entrada_fecha(id_dispositivo: str, entrada: str, f_inicio: da
     )
 
     if not resultado:
-        return {
-            "IDDispositivo": id_dispositivo,
-            "entrada": entrada,
-            "total": None
-        }
+        raise RecursoNoEncontradoError(
+            f"No hay pulsos de '{entrada.value}' "
+            f"para el dispositivo '{id_dispositivo}' "
+            f"entre '{f_inicio}' y  '{f_fin}'"
+        )
 
-    return {
-        "IDDispositivo": id_dispositivo,
-        "entrada": entrada,
-        "total": resultado[0]["conteo_pulsaciones"]
-    }
+    return PulsosResponse(
+        IDDispositivo=id_dispositivo,
+        entrada=entrada,
+        total=resultado[0]["conteo_pulsaciones"]
+    )

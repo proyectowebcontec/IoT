@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from models.errores import RecursoNoEncontradoError
+from schemas.dispositivos import Dispositivo
 from database.mongodb import monitoreos_collection
 
 
@@ -8,7 +10,7 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get("/", response_model=list[Dispositivo])
 def obtener_dispositivos():
 
     dispositivos = list(
@@ -26,6 +28,11 @@ def obtener_dispositivos():
             }
         ])
     )
+
+    if not dispositivos:
+        raise RecursoNoEncontradoError(
+            f"No hay dispositivos registrados."
+        )
 
     return dispositivos
 

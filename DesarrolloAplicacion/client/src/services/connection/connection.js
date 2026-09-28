@@ -67,6 +67,24 @@ export const obtenerDispositivos = async () => {
 
 };
 
+export const obtenerMonitoreos = async (idDispositivo, fechaInicio, fechaFin) => {
+    try {
+        const response = await connection.get(`/monitoreos/${idDispositivo}/${fechaInicio}/${fechaFin}`);
+
+        return response.data
+    } catch (error) {
+        if (error.response?.status === 404) {
+            console.error(`No se encontraron registros del dispositivo ${idDispositivo}.`);
+            return;
+        } else if (error.response?.status === 400) {
+            console.error(error.response.data.error);
+            return;
+        }
+        console.error(`Error al buscar registros del dispositivo ${idDispositivo}.`, error);
+        throw error.response ? error.response.data : 'Error desconocido';
+    }
+};
+
 export const obtenerConteoPulsaciones = async (idDispositivo, entrada, fechaInicio, fechaFin) => {
     try {
         const response = await connection.get(`/dashboard/pulsos/${idDispositivo}/${entrada}/${fechaInicio}/${fechaFin}`);

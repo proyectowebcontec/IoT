@@ -37,27 +37,27 @@ export default function ChartsGrid({ chartData }) {
 
       <div className="charts-grid">
         <ChartCard
-          title="Variable principal"
-          subtitle="Comportamiento histórico"
+          title="Fase 1"
+          subtitle="Corriente en la fase 1 (A)"
           config={chartData.principal}
+        />
+
+        <ChartCard
+          title="Fase 2"
+          subtitle="Corriente en la fase 2 (A)"
+          config={chartData.voltajeX}
+        />
+
+        <ChartCard
+          title="Fase 3"
+          subtitle="Corriente en la fase 3 (A)"
+          config={chartData.voltajeY}
         />
 
         <ChartCard
           title="Pulsaciones"
           subtitle="Eventos registrados"
           config={chartData.pulsaciones}
-        />
-
-        <ChartCard
-          title="Voltaje X"
-          subtitle="Lecturas de entrada analógica"
-          config={chartData.voltajeX}
-        />
-
-        <ChartCard
-          title="Voltaje Y"
-          subtitle="Lecturas de entrada analógica"
-          config={chartData.voltajeY}
         />
       </div>
     </section>
