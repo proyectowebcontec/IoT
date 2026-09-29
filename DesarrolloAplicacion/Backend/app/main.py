@@ -34,6 +34,10 @@ def read_root():
 def read_item(item_id: int, q: str | None = None):
     return {"item_id": item_id, "q": q}
 
+@app.get("/health")
+def get_health():
+    return {"status": 1}
+
 # --------------------------------------------------
 # Manejo de errores
 # --------------------------------------------------
