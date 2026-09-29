@@ -48,8 +48,6 @@ useEffect(() => {
     setFiltros((prev) => ({ ...prev, [field]: value }));
   };
 
-  // TODO: dispara la consulta al backend y llena la tabla, por ejemplo
-  // llamando esto desde un botón "Buscar" o cada vez que cambian los filtros:
  const handleBuscar = async () => {
     try {
       const data = await Service.obtenerMonitoreos(filtros.dispositivoId, filtros.fechaInicio, filtros.fechaFin);
@@ -57,6 +55,7 @@ useEffect(() => {
       setRegistros(data);
       //console.log(data)
     } catch (error) {
+      setRegistros([])
       console.error("Error al obtener monitoreos:", error);
     } 
  };
