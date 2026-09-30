@@ -4,6 +4,7 @@ from api.routes.monitoreos import router as monitoreos_router
 from api.routes.dispositivos import router as dispositivos_router
 from api.routes.dashboard import router as dashboard_router
 from api.routes.validaciones import router as validaciones_router
+from api.routes.alarmas import router as alarmas_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -44,3 +45,4 @@ app.include_router(monitoreos_router)
 app.include_router(dispositivos_router)
 app.include_router(dashboard_router)
 app.include_router(validaciones_router)
+app.include_router(alarmas_router)
