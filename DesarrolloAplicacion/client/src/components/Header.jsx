@@ -1,4 +1,4 @@
-export default function Header() {
+export default function Header({status}) {  
   return (
     <header className="header">
       <div>
@@ -9,7 +9,7 @@ export default function Header() {
       </div>
 
       <div className="header-status">
-        <span className="status-indicator"></span>
+        <span className={status ? ("status-indicator") : ("status-indicator2") }></span>
         Sistema de monitoreo
       </div>
     </header>

@@ -49,7 +49,7 @@ export default function Dispositivos() {
 
   return (
     <>
-      <Header />
+      <Header status={1}/>
 
       <main className="content">
         <div className="page-header">

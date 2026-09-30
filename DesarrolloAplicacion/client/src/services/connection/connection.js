@@ -8,6 +8,17 @@ const connection = axios.create({
     }
 });
 
+export const is_connected = async() => {
+    try {
+        const response = await connection.get('/health');
+
+        return response.data;
+    } catch (error) {
+        console.error("Error al verificar la salud de la API", error);
+        throw error.response ? error.response.data : 'Error desconocido';
+    }
+}
+
 
 export const obtenerConteoDispositivos = async () => {
     try {

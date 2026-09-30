@@ -14,6 +14,7 @@ const FILTROS_INICIALES = {
 };
 
 export default function Historial() {
+  const [status, setStatus] = useState(0);
   const [dispositivos, setDispositivos] = useState([]);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
   const [registros, setRegistros] = useState([]);
@@ -33,8 +34,20 @@ useEffect(() => {
       }
       
     }
+
+    const fetchStatus = async () => {
+      try {
+        const estado = await Service.is_connected();
+
+        setStatus(estado);
+        console.log(estado)
+      } catch (error) {
+        console.error("Error al verificar salud de la API", error);
+      }
+    }
     
     fetchDispositivos()
+    fetchStatus()
   }, []);
 
 useEffect(() => {
@@ -90,7 +103,7 @@ useEffect(() => {
 
   return (
     <>
-      <Header />
+      <Header status={status}/>
 
       <main className="content">
         <div className="page-header">

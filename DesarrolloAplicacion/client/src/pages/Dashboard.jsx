@@ -17,6 +17,7 @@ const FILTROS_INICIALES = {
 };
 
 export default function Dashboard() {
+  const [status, setStatus] = useState(0);
   const [dispositivos, setDispositivos] = useState([]);
   const [isTiempoReal, setIsTiempoReal] = useState(false);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
@@ -59,8 +60,20 @@ export default function Dashboard() {
       }
       
     }
+
+    const fetchStatus = async () => {
+      try {
+        const estado = await Service.is_connected();
+
+        setStatus(estado);
+        console.log(estado)
+      } catch (error) {
+        console.error("Error al verificar salud de la API", error);
+      }
+    }
     
     fetchDispositivos()
+    fetchStatus()
   }, []);
 
   useEffect(() => {
@@ -351,7 +364,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <Header />
+      <Header status={status} />
 
       <main className="content">
         <div className="page-header">
