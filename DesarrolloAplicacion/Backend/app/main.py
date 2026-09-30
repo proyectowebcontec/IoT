@@ -3,6 +3,7 @@ from models.errores import ErrorDominio, manejar_error_dominio
 from api.routes.monitoreos import router as monitoreos_router
 from api.routes.dispositivos import router as dispositivos_router
 from api.routes.dashboard import router as dashboard_router
+from api.routes.validaciones import router as validaciones_router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
@@ -34,10 +35,6 @@ def read_root():
 def read_item(item_id: int, q: str | None = None):
     return {"item_id": item_id, "q": q}
 
-@app.get("/health")
-def get_health():
-    return {"status": 1}
-
 # --------------------------------------------------
 # Manejo de errores
 # --------------------------------------------------
@@ -46,3 +43,4 @@ app.add_exception_handler(ErrorDominio, manejar_error_dominio)
 app.include_router(monitoreos_router)
 app.include_router(dispositivos_router)
 app.include_router(dashboard_router)
+app.include_router(validaciones_router)
