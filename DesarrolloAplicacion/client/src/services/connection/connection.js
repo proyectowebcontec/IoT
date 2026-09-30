@@ -222,3 +222,21 @@ export const obtenerHistorialMediciones = async (idDispositivo, entrada) => {
         throw error.response ? error.response.data : 'Error desconocido';
     }
 };
+
+export const enviarSMS = async (telefono) => {
+    try {
+        const response = await connection.get(`/alarmas/sms/${telefono}`);
+
+        return response.data
+    } catch (error) {
+        if (error.response?.status === 500) {
+            console.error(`No se pudo enviar la alarma al número ${telefono} en TR.`);
+            return;
+        } else if (error.response?.status === 400) {
+            console.error(error.response.data.error);
+            return;
+        }
+        console.error(`Error al buscar registros para la entrada ${entrada} del dispositivo ${idDispositivo} en TR.`, error);
+        throw error.response ? error.response.data : 'Error desconocido';
+    }
+};

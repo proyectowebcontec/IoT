@@ -1,5 +1,6 @@
 import useChart from "../hooks/useChart";
 import { useState } from "react";
+import Service from '../services/Service';
 
 function ChartCard({ title, subtitle, config }) {
   const canvasRef = useChart(config);
@@ -29,9 +30,13 @@ function ChartCard({ title, subtitle, config }) {
 export default function ChartsGrid({ chartData }) {
   const [termino, setTermino] = useState('');
   
-  const handleClic= (telefono) => {
-    // Agregar funcionalidad
-      return;
+  const handleClic = async (telefono) => {
+    try {
+      const response = await Service.enviarSMS(telefono)
+      console.log(response)
+    } catch (error) {
+      console.error("Error al enviar mensaje:", error);
+    }
   }
   
   return (
