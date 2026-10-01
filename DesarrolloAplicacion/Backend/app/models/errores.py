@@ -36,6 +36,12 @@ class RangoFechasInvalidoError(ErrorDominio):
     codigo = "RANGO_FECHAS_INVALIDO"
     status_code = 422
 
+class NumeroTelefonoError(ErrorDominio):
+    """El numero de teléfono proporcionado no es válido."""
+
+    codigo = "NUMERO_TELEFONO_INVALIDO"
+    status_code = 422
+
 
 async def manejar_error_dominio(request: Request, exc: ErrorDominio) -> JSONResponse:
     """

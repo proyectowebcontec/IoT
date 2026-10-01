@@ -6,11 +6,14 @@ from datetime import datetime
 from uuid import uuid4
 
 from pydantic import ValidationError
-from pymongo import MongoClient
-from .configure import BROKER, PORT, TOPIC, CLIENT_ID, MONGO_URI, DATABASE_NAME, COLLECTION_NAME
+from .configure import BROKER, PORT, TOPIC, CLIENT_ID
+from ..database.mongodb import monitoreos_collection
 
 from ..schemas.gateway151 import GatewayData
 from ..schemas.monitoreo import Medicion, Monitoreo
+from ..alarms import AlarmService
+
+alarm_service = AlarmService()
 
 ID_DISPOSITIVO = "WHG-151-001"
 
@@ -59,14 +62,6 @@ DESCRIPCIONES = {
 
     "S": "Sensor S"
 }
-
-# MONGODB
-def get_db_connection():
-    mongo_client = MongoClient(MONGO_URI)
-    db = mongo_client[DATABASE_NAME]
-    collection = db[COLLECTION_NAME]
-
-    return collection
 
 # Save meassures
 def guardar_monitoreo(data: GatewayData):
@@ -142,9 +137,9 @@ def guardar_monitoreo(data: GatewayData):
     # --------------------------------------
     # Guardar
     # --------------------------------------
-    collection = get_db_connection()
 
-    collection.insert_one(monitoreo.model_dump())
+    monitoreos_collection.insert_one(monitoreo.model_dump())
+    alarm_service.evaluate(monitoreo)
 
     print(
         f"Monitoreo almacenado: "
