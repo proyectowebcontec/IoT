@@ -18,6 +18,11 @@ def enviar_sms(numero_destino: str):
         TWILIO_TOKEN
     )
 
+    if not numero_destino.startswith("+502"):
+        numero_destino = "+502" + numero_destino
+    elif numero_destino.startswith("502"):
+        numero_destino = "+" + numero_destino
+
     try:
         mensaje = client.messages.create(
             body="Alerta: se ha detectado una condición que requiere atención.",
@@ -27,7 +32,6 @@ def enviar_sms(numero_destino: str):
 
         return {
             "mensaje": "SMS enviado correctamente",
-            "sid": mensaje.sid,
             "destino": numero_destino
         }
 

@@ -13,8 +13,8 @@ export default function Dispositivos() {
   // const [dispositivos, setDispositivos] = useState([]);
   // useEffect(() => { fetchDispositivos().then(setDispositivos); }, []);
   const [dispositivos] = useState([
-    { id: 1, nombre: "Sensor planta 2", conectado: true, ultimoMantenimiento: "12/08/2026", ultimaConexion: "Hace 3 min" },
-    { id: 2, nombre: "Sensor planta 3", conectado: false, ultimoMantenimiento: "02/07/2026", ultimaConexion: "Hace 2 días" },
+    { id: 1, nombre: "Gateway WHG 151", conectado: true, ultimoMantenimiento: "12/08/2026", ultimaConexion: "Hace 3 min" },
+    { id: 2, nombre: "Gateway NE 206", conectado: false, ultimoMantenimiento: "02/07/2026", ultimaConexion: "Hace 2 días" },
   ]);
 
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);

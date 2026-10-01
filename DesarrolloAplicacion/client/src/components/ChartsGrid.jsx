@@ -53,7 +53,7 @@ export default function ChartsGrid({ chartData }) {
             value={termino} 
             onChange={(e) => setTermino(e.target.value)}
           />
-          <button type="button" className="btn-filter" onClick={handleClic}>Enviar alerta</button>
+          <button type="button" className="btn-filter" onClick={() => handleClic(termino)}>Enviar alerta</button>
         </div>
       </div>
 
