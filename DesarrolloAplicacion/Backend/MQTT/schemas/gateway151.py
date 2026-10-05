@@ -8,5 +8,5 @@ class SensorData(BaseModel):
 
 
 class GatewayData(BaseModel):
-    times: str
+    times: str | None = None
     sensorDatas: list[SensorData]
