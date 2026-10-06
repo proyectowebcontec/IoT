@@ -109,7 +109,7 @@ export default function Dashboard() {
       setMetrics(prev => ({
         ...prev,
         registros: noMonitoreos.total_monitoreos,
-        pulsaciones: noPulsaciones.total
+        pulsaciones: noPulsaciones ? noPulsaciones.total : undefined
       }));
 
       // Obener los promedios de las variables observadas
@@ -276,7 +276,7 @@ export default function Dashboard() {
       //console.log(noPulsaciones)
       setMetrics(prev => ({
         ...prev,
-        pulsaciones: noPulsaciones.total
+        pulsaciones: noPulsaciones ? noPulsaciones.total : undefined
       }));
 
       // Obener los promedios de las variables observadas

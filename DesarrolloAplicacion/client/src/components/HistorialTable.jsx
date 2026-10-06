@@ -3,6 +3,18 @@ import { useState } from "react";
 // registros: [{ObjectId, IDMonitoreo, IDDispositivo, FechaMonitoreo, FechaCargaDB, Mediciones: [IdMedicion, descripcion, entrada, valor]}
 export default function HistorialTable({ registros }) {
   const [page, setPage] = useState(0);
+  const COLUMNAS = [
+    { entrada: 'U1', decimales: 4 },
+    { entrada: 'U2', decimales: 4 },
+    { entrada: 'U3', decimales: 4 },
+    { entrada: 'DI3', decimales: 0 },
+  ];
+
+  const fmtFecha = new Intl.DateTimeFormat('es-GT', { dateStyle: 'short', timeStyle: 'medium' });
+
+  const formatear = (valor, decimales) =>
+    typeof valor === 'number' ? valor.toFixed(decimales) : '----';
+
   const itemPage = 15;
 
   const Next = () => {
@@ -34,7 +46,6 @@ export default function HistorialTable({ registros }) {
               <th scope="col">Corriente en Fase 1</th>
               <th scope="col">Corriente en Fase 2</th>
               <th scope="col">Corriente en Fase 3</th>
-              <th scope="col">Variable 4</th>
               <th scope="col">Pulsaciones</th>
             </tr>
           </thead>
@@ -46,18 +57,22 @@ export default function HistorialTable({ registros }) {
                   No hay registros para mostrar. Ajuste los filtros y aplique la búsqueda.
                 </td>
               </tr>
-            ) : (
-              data.map((r) => (
-                <tr key={r.IDMonitoreo}>
-                  <td>{new Intl.DateTimeFormat('es-GT', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(r.FechaMonitoreo))}</td>
-                  <td>{r.IDDispositivo}</td>
-                  <td>{r.Mediciones[0].valor.toFixed(4) ?? "----"}</td>
-                  <td>{r.Mediciones[1].valor.toFixed(4) ?? "----"}</td>
-                  <td>{r.Mediciones[2].valor.toFixed(4) ?? "----"}</td>
-                  <td>{r.Mediciones[3].valor.toFixed(4) ?? "----"}</td>
-                  <td>{r.Mediciones[24].valor ?? "----"}</td>
-                </tr>
-              ))
+            ) : ( 
+              data.map((r) => {
+                // Convierte el arreglo en { U5: 19.63, U6: 9.61, ... }
+                const valores = Object.fromEntries(
+                  (r.Mediciones ?? []).map((m) => [m.entrada, m.valor])
+                );
+                return (
+                  <tr key={r.IDMonitoreo}>
+                    <td>{fmtFecha.format(new Date(r.FechaMonitoreo))}</td>
+                    <td>{r.IDDispositivo}</td>
+                    {COLUMNAS.map((c) => (
+                      <td key={c.entrada}>{formatear(valores[c.entrada], c.decimales)}</td>
+                    ))}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
