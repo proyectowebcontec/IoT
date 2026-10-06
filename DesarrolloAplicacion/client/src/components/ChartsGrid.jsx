@@ -48,6 +48,7 @@ export default function ChartsGrid({ chartData }) {
         </div>
         <div>
           <input 
+            id="numero"
             type="text" 
             placeholder="eje. 5678 9807" 
             value={termino} 

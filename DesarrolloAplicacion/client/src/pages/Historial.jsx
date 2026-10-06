@@ -66,7 +66,7 @@ useEffect(() => {
       const data = await Service.obtenerMonitoreos(filtros.dispositivoId, filtros.fechaInicio, filtros.fechaFin);
       //console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
       setRegistros(data);
-      //console.log(data)
+      console.log(data)
     } catch (error) {
       setRegistros([])
       console.error("Error al obtener monitoreos:", error);
