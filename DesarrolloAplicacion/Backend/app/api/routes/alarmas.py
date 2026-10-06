@@ -25,7 +25,7 @@ def enviar_sms(numero_destino: str):
 
     try:
         mensaje = client.messages.create(
-            body="Alerta: se ha detectado una condición que requiere atención.",
+            body="**Alarma IoT – Contec Industrial**\nEquipo: Grúa A\nUbicación: Latitud +23.4234, Longitud +23.4234\nFalla detectada: Sobrecarga eléctrica. Verificar de inmediato.",
             from_=TWILIO_FROM_PHONE,
             to=numero_destino
         )
