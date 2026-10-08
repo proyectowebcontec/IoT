@@ -3,7 +3,7 @@ import queue
 import signal
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import uuid4
 
 import paho.mqtt.client as mqtt
@@ -95,8 +95,8 @@ def construir_monitoreo(data: GatewayData) -> Monitoreo:
     return Monitoreo(
         IDMonitoreo=str(uuid4()),
         IDDispositivo=ID_DISPOSITIVO,
-        FechaMonitoreo=datetime.now(timezone.utc),
-        FechaCargaDB=datetime.now(timezone.utc),
+        FechaMonitoreo=datetime.now(),
+        FechaCargaDB=datetime.now(),
         Mediciones=mediciones,
     )
 

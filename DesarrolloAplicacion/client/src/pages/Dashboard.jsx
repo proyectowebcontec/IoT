@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Header from "../components/Header";
 import DashboardNavbar from "../components/DashboardNavbar";
 import FiltersPanel from "../components/FiltersPanel";
@@ -15,6 +15,8 @@ const FILTROS_INICIALES = {
   fechaInicio: "",
   fechaFin: "",
 };
+
+const INTERVALO_MS = 1000;
 
 export default function Dashboard() {
   const [status, setStatus] = useState(0);
@@ -34,6 +36,21 @@ export default function Dashboard() {
     voltajeX: { type: "line", data: { labels: [], datasets: [] } },
     voltajeY: { type: "line", data: { labels: [], datasets: [] } },
   });
+
+  const lineaConfig = (label, mediciones) => ({
+    type: "line",
+    data: {
+      labels: mediciones.fechas,
+      datasets: [{ label, data: mediciones.valores }],
+    },
+  });
+
+  // Formatea un promedio sin perder el valor 0
+  const formatoPromedio = (r) =>
+    r?.promedio != null ? Number(r.promedio).toFixed(4) : undefined;
+
+  // Guarda la "huella" de la última ventana de datos para no redibujar si no cambió
+  const ultimaVentanaRef = useRef(null);
 
 
   useEffect(() => {
@@ -77,132 +94,81 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (!isTiempoReal || filtros.dispositivoId === "") {
-      return;
-    }
+    if (!isTiempoReal || filtros.dispositivoId === "") return;
 
-    // Cargar inmediatamente
-    cargarDatosTiempoReal();
+    const dispositivoId = filtros.dispositivoId;
+    let activo = true;
+    let timer;
+    ultimaVentanaRef.current = null;
 
-    // Luego cada 10 segundos
-    const intervalo = setInterval(() => {
-      cargarDatosTiempoReal();
-    }, 10000);
-
-    // Limpiar el intervalo
-    return () => {
-      clearInterval(intervalo);
+    // setTimeout encadenado: la siguiente consulta empieza cuando termina la anterior
+    const ciclo = async () => {
+      if (!document.hidden) {
+        await cargarDatosTiempoReal(dispositivoId, () => activo);
+      }
+      if (activo) timer = setTimeout(ciclo, INTERVALO_MS);
     };
 
+    ciclo();
+
+    return () => {
+      activo = false;
+      clearTimeout(timer);
+    };
   }, [isTiempoReal, filtros.dispositivoId]);
 
-  const cargarDatosTiempoReal = async () => {
-    if (filtros.dispositivoId === "") return;
-
+  const cargarDatosTiempoReal = async (dispositivoId, sigueActivo) => {
     try {
-      // Actualizar cantidad de registros
-      const noMonitoreos = await Service.obtenerNoMonitoreos();
+      // Todas las peticiones en paralelo
+      const [
+        noMonitoreos,
+        noPulsaciones,
+        avgU1, avgU2, avgU3,
+        dataU1, dataU2, dataU3, dataDI3,
+      ] = await Promise.all([
+        Service.obtenerNoMonitoreos(),
+        Service.obtenerConteoPulsacionesTR(dispositivoId, "DI3"),
+        Service.obtenerPromedioVariableTR(dispositivoId, "U1"),
+        Service.obtenerPromedioVariableTR(dispositivoId, "U2"),
+        Service.obtenerPromedioVariableTR(dispositivoId, "U3"),
+        Service.obtenerDashboardTR(dispositivoId, "U1"),
+        Service.obtenerDashboardTR(dispositivoId, "U2"),
+        Service.obtenerDashboardTR(dispositivoId, "U3"),
+        Service.obtenerDashboardTR(dispositivoId, "DI3"),
+      ]);
 
-      //Conteo de pulsaciones
-      const noPulsaciones = await Service.obtenerConteoPulsacionesTR(filtros.dispositivoId, "DI3");
-      //console.log(noPulsaciones)
-      setMetrics(prev => ({
+      // Si el usuario cambia de dispositivo o sale del modo tiempo real, ignorar
+      if (!sigueActivo()) return;
+
+      const mU1 = extraerDatos(dataU1);
+      const mU2 = extraerDatos(dataU2);
+      const mU3 = extraerDatos(dataU3);
+      const mDI3 = extraerDatos(dataDI3);
+
+      // Actualizar todo junto en un solo render
+      setMetrics((prev) => ({
         ...prev,
-        registros: noMonitoreos.total_monitoreos,
-        pulsaciones: noPulsaciones ? noPulsaciones.total : undefined
+        registros: noMonitoreos?.total_monitoreos,
+        pulsaciones: noPulsaciones?.total,
       }));
 
-      // Obener los promedios de las variables observadas
-      const avgEntradaU1 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U1")
-      const avgEntradaU2 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U2")
-      const avgEntradaU3 = await Service.obtenerPromedioVariableTR(filtros.dispositivoId, "U3")
-      //console.log(avgEntradaU1)
-
       setAverages({
-        v1: avgEntradaU1.promedio ? avgEntradaU1.promedio.toFixed(4) : undefined,
-        v2: avgEntradaU2.promedio ? avgEntradaU2.promedio.toFixed(4) : undefined, 
-        v3: avgEntradaU3.promedio ? avgEntradaU3.promedio.toFixed(4) : undefined})
-
-      // Gráficos     
-      const dataU1 = await Service.obtenerDashboardTR(
-        filtros.dispositivoId,
-        "U1"
-      );
-
-      const dataU2 = await Service.obtenerDashboardTR(
-        filtros.dispositivoId,
-        "U2"
-      );
-
-      const dataU3 = await Service.obtenerDashboardTR(
-        filtros.dispositivoId,
-        "U3"
-      );
-
-      const dataDI3 = await Service.obtenerDashboardTR(
-        filtros.dispositivoId,
-        "DI3"
-      );
-
-      const medicionesU1 = extraerDatos(dataU1);
-      const medicionesU2 = extraerDatos(dataU2);
-      const medicionesU3 = extraerDatos(dataU3);
-      const medicionesDI3 = extraerDatos(dataDI3);
-
-      setChartData({
-        principal: {
-          type: "line",
-          data: {
-            labels: medicionesU1.fechas,
-            datasets: [
-              {
-                label: "U1",
-                data: medicionesU1.valores,
-              },
-            ],
-          },
-        },
-
-        pulsaciones: {
-          type: "line",
-          data: {
-            labels: medicionesDI3.fechas,
-            datasets: [
-              {
-                label: "DI3",
-                data: medicionesDI3.valores,
-              },
-            ],
-          },
-        },
-
-        voltajeX: {
-          type: "line",
-          data: {
-            labels: medicionesU2.fechas,
-            datasets: [
-              {
-                label: "U2",
-                data: medicionesU2.valores,
-              },
-            ],
-          },
-        },
-
-        voltajeY: {
-          type: "line",
-          data: {
-            labels: medicionesU3.fechas,
-            datasets: [
-              {
-                label: "U3",
-                data: medicionesU3.valores,
-              },
-            ],
-          },
-        },
+        v1: formatoPromedio(avgU1),
+        v2: formatoPromedio(avgU2),
+        v3: formatoPromedio(avgU3),
       });
 
+      // Las gráficas se actualizan solo si llegan datos nuevos
+      const ventana = `${mU1.fechas[0]}|${mU1.fechas.at(-1)}|${mDI3.fechas.at(-1)}`;
+      if (ventana === ultimaVentanaRef.current) return;
+      ultimaVentanaRef.current = ventana;
+
+      setChartData({
+        principal: lineaConfig("U1", mU1),
+        pulsaciones: lineaConfig("DI3", mDI3),
+        voltajeX: lineaConfig("U2", mU2),
+        voltajeY: lineaConfig("U3", mU3),
+      });
     } catch (error) {
       console.error("Error cargando datos en tiempo real:", error);
     }
