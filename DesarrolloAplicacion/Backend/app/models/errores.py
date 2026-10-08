@@ -17,6 +17,8 @@ class ErrorDominio(Exception):
 
     codigo: str = "ERROR_DESCONOCIDO"
     status_code: int = 400
+    total: int = None
+    promedio: float = None
 
     def __init__(self, mensaje: str):
         self.mensaje = mensaje
@@ -36,6 +38,12 @@ class RangoFechasInvalidoError(ErrorDominio):
     codigo = "RANGO_FECHAS_INVALIDO"
     status_code = 422
 
+class NumeroTelefonoError(ErrorDominio):
+    """El numero de teléfono proporcionado no es válido."""
+
+    codigo = "NUMERO_TELEFONO_INVALIDO"
+    status_code = 422
+
 
 async def manejar_error_dominio(request: Request, exc: ErrorDominio) -> JSONResponse:
     """
@@ -47,7 +55,9 @@ async def manejar_error_dominio(request: Request, exc: ErrorDominio) -> JSONResp
         content={
             "error": {
                 "codigo": exc.codigo,
-                "mensaje": exc.mensaje
+                "mensaje": exc.mensaje,
+                "total": exc.total,
+                "promedio": exc.promedio
             }
         }
     )

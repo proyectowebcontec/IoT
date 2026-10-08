@@ -18,6 +18,11 @@ DesarrolloAplicacion/Backend/app/models/__pycache__/
 DesarrolloAplicacion/Backend/app/schemas/__pycache__/
 DesarrolloAplicacion/Backend/app/utils/__pycache__
 DesarrolloAplicacion/Backend/app/database/__pycache__
+DesarrolloAplicacion/Backend/MQTT/alarms/__pycache__
+DesarrolloAplicacion/Backend/MQTT/Subscriber/__pycache__
+DesarrolloAplicacion/Backend/MQTT/__pycache__
+DesarrolloAplicacion/Backend/MQTT/database/__pycache__
+DesarrolloAplicacion/Backend/MQTT/schemas/__pycache__
 
 DesarrolloAplicacion/Backend/.env
 

@@ -8,6 +8,17 @@ const connection = axios.create({
     }
 });
 
+export const is_connected = async() => {
+    try {
+        const response = await connection.get('/health');
+
+        return response.data;
+    } catch (error) {
+        console.error("Error al verificar la salud de la API", error);
+        throw error.response ? error.response.data : 'Error desconocido';
+    }
+}
+
 
 export const obtenerConteoDispositivos = async () => {
     try {
@@ -25,7 +36,7 @@ export const obtenerConteoDispositivos = async () => {
             return;
         }
         console.error("Error al contar dispositivos", error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };
 
@@ -44,7 +55,7 @@ export const obtenerNoMonitoreos = async () => {
             return;
         }
         console.error("Error al contar la cantidad total de monitoreos", error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };
 
@@ -62,7 +73,7 @@ export const obtenerDispositivos = async () => {
             return;
         }
         console.error("Error al buscar dispositivos registrados", error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 
 };
@@ -75,13 +86,13 @@ export const obtenerMonitoreos = async (idDispositivo, fechaInicio, fechaFin) =>
     } catch (error) {
         if (error.response?.status === 404) {
             console.error(`No se encontraron registros del dispositivo ${idDispositivo}.`);
-            return;
+            return [];
         } else if (error.response?.status === 400) {
             console.error(error.response.data.error);
-            return;
+            return [];
         }
         console.error(`Error al buscar registros del dispositivo ${idDispositivo}.`, error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };
 
@@ -99,7 +110,7 @@ export const obtenerConteoPulsaciones = async (idDispositivo, entrada, fechaInic
             return;
         }
         console.error(`Error al buscar pulsaciones para la entrada ${entrada} del dispositivo ${idDispositivo}.`, error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response?.data.error : 'Error desconocido';
     }
 };
 
@@ -111,13 +122,13 @@ export const obtenerDashboard = async (idDispositivo, entrada, fechaInicio, fech
     } catch (error) {
         if (error.response?.status === 404) {
             console.error(`No se encontraron registros para la entrada ${entrada} del dispositivo ${idDispositivo}.`);
-            return;
+            return [];
         } else if (error.response?.status === 400) {
             console.error(error.response.data.error);
-            return;
+            return [];
         }
         console.error(`Error al buscar registros para la entrada ${entrada} del dispositivo ${idDispositivo}.`, error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };
 
@@ -135,7 +146,7 @@ export const obtenerPromedioVariableTR = async (idDispositivo, entrada) => {
             return;
         }
         console.error(`Error al calculr el promedio para la entrada ${entrada} del dispositivo ${idDispositivo} en TR.`, error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 }
 
@@ -143,7 +154,7 @@ export const obtenerPromedioVariableTR = async (idDispositivo, entrada) => {
 export const obtenerConteoPulsacionesTR = async (idDispositivo, entrada) => {
     try {
         const response = await connection.get(`/dashboard/pulsos/${idDispositivo}/${entrada}`);
-
+        
         return response.data;
     } catch (error) {
         if (error.response?.status === 404) {
@@ -154,7 +165,7 @@ export const obtenerConteoPulsacionesTR = async (idDispositivo, entrada) => {
             return;
         }
         console.error(`Error al buscar pulsaciones para la entrada ${entrada} del dispositivo ${idDispositivo} en TR.`, error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };
 
@@ -172,7 +183,7 @@ export const obtenerDashboardTR = async (idDispositivo, entrada) => {
             return;
         }
         console.error(`Error al buscar registros para la entrada ${entrada} del dispositivo ${idDispositivo} en TR.`, error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };
 
@@ -190,7 +201,7 @@ export const obtenerPromedioVariable = async (idDispositivo, entrada, fechaInici
             return;
         }
         console.error(`Error al calculr el promedio para la entrada ${entrada} del dispositivo ${idDispositivo}.`, error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 }
 
@@ -208,6 +219,24 @@ export const obtenerHistorialMediciones = async (idDispositivo, entrada) => {
             return;
         }
         console.error(`Error al buscar registros para la entrada ${entrada} del dispositivo ${idDispositivo} en TR.`, error);
-        throw error.response ? error.response.data : 'Error desconocido';
+        throw error.response ? error.response.data.error : 'Error desconocido';
+    }
+};
+
+export const enviarSMS = async (telefono) => {
+    try {
+        const response = await connection.post(`/alarmas/sms/${telefono}`);
+
+        return response.data
+    } catch (error) {
+        if (error.response?.status === 500) {
+            console.error(`No se pudo enviar la alarma al número ${telefono} en TR.`);
+            return;
+        } else if (error.response?.status === 400) {
+            console.error(error.response.data.error);
+            return;
+        }
+        console.error(`Error al enviar mensaje de txto al número ${telefono}.`, error);
+        throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };

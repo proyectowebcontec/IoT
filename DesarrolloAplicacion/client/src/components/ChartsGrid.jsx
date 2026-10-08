@@ -1,4 +1,6 @@
 import useChart from "../hooks/useChart";
+import { useState } from "react";
+import Service from '../services/Service';
 
 function ChartCard({ title, subtitle, config }) {
   const canvasRef = useChart(config);
@@ -26,12 +28,33 @@ function ChartCard({ title, subtitle, config }) {
 //   voltajeY: Chart.js config,
 // }
 export default function ChartsGrid({ chartData }) {
+  const [termino, setTermino] = useState('');
+  
+  const handleClic = async (telefono) => {
+    try {
+      const response = await Service.enviarSMS(telefono)
+      console.log(response)
+    } catch (error) {
+      console.error("Error al enviar mensaje:", error);
+    }
+  }
+  
   return (
     <section className="section-block">
       <div className="section-header">
         <div>
           <h2>Comportamiento de variables</h2>
           <p>Tendencias obtenidas de los dispositivos seleccionados.</p>
+        </div>
+        <div>
+          <input 
+            id="numero"
+            type="text" 
+            placeholder="eje. 5678 9807" 
+            value={termino} 
+            onChange={(e) => setTermino(e.target.value)}
+          />
+          <button type="button" className="btn-filter" onClick={() => handleClic(termino)}>Enviar alerta</button>
         </div>
       </div>
 

@@ -166,6 +166,20 @@ body {
 
 }
 
+.status-indicator2 {
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background-color: #d95555;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(217, 85, 85, 0.15);
+
+}
 
 /* ============================= */
 /* CABECERA DE PÁGINA             */

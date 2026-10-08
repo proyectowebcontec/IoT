@@ -14,6 +14,7 @@ const FILTROS_INICIALES = {
 };
 
 export default function Historial() {
+  const [status, setStatus] = useState(0);
   const [dispositivos, setDispositivos] = useState([]);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
   const [registros, setRegistros] = useState([]);
@@ -33,8 +34,20 @@ useEffect(() => {
       }
       
     }
+
+    const fetchStatus = async () => {
+      try {
+        const estado = await Service.is_connected();
+
+        setStatus(estado);
+        console.log(estado)
+      } catch (error) {
+        console.error("Error al verificar salud de la API", error);
+      }
+    }
     
     fetchDispositivos()
+    fetchStatus()
   }, []);
 
 useEffect(() => {
@@ -48,15 +61,14 @@ useEffect(() => {
     setFiltros((prev) => ({ ...prev, [field]: value }));
   };
 
-  // TODO: dispara la consulta al backend y llena la tabla, por ejemplo
-  // llamando esto desde un botón "Buscar" o cada vez que cambian los filtros:
  const handleBuscar = async () => {
     try {
       const data = await Service.obtenerMonitoreos(filtros.dispositivoId, filtros.fechaInicio, filtros.fechaFin);
       //console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
       setRegistros(data);
-      //console.log(data)
+      console.log(data)
     } catch (error) {
+      setRegistros([])
       console.error("Error al obtener monitoreos:", error);
     } 
  };
@@ -91,7 +103,7 @@ useEffect(() => {
 
   return (
     <>
-      <Header />
+      <Header status={status}/>
 
       <main className="content">
         <div className="page-header">
