@@ -5,9 +5,14 @@ import FiltersPanel from "../components/FiltersPanel";
 import MetricCards from "../components/MetricCards";
 import AveragesGrid from "../components/AveragesGrid";
 import ChartsGrid from "../components/ChartsGrid";
+import "../styles/dashboard.css";
 
 import { calcularRangoPorPeriodo } from "../utils/ConversorFechas";
 import Service from '../services/Service';
+
+import { Bounce, toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const FILTROS_INICIALES = {
   dispositivoId: "",
@@ -74,6 +79,7 @@ export default function Dashboard() {
         //console.log(metrics.dispositivos)
       } catch (error) {
         console.error("Error al contar dispositivos:", error);
+        toast.error(`Error: No se encontraron dispositivos.`, { position: 'top-right' });
       }
       
     }
@@ -83,9 +89,10 @@ export default function Dashboard() {
         const estado = await Service.is_connected();
 
         setStatus(estado);
-        console.log(estado)
+        toast.success("Sistema activado exitósamente", { position: "top-right", });
       } catch (error) {
         console.error("Error al verificar salud de la API", error);
+        toast.error(`Error: El sistema no está disponible.`, { position: 'top-right' });
       }
     }
     
@@ -171,6 +178,7 @@ export default function Dashboard() {
       });
     } catch (error) {
       console.error("Error cargando datos en tiempo real:", error);
+      toast.error(`Error: No se pueden mostrar los datos en tiempo real.`, { position: 'top-right' });
     }
   };
 
@@ -228,6 +236,7 @@ export default function Dashboard() {
 
   const handleAplicarFiltros = async () => {
     if (filtros.dispositivoId === "") {
+      toast.error("Error: Debe indicar un dispositivo.", {position:'top-right'})
       return;
     }
 
@@ -325,6 +334,7 @@ export default function Dashboard() {
       
     } catch (error) {
       console.error("Error en consultas filtradas:", error);
+      toast.error(`Error: No se aplicaron los filtros.`, { position: 'top-right' });
     }
   };
 
@@ -356,6 +366,19 @@ export default function Dashboard() {
 
         <ChartsGrid chartData={chartData} />
       </main>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition: Bounce
+        />
     </>
   );
 }

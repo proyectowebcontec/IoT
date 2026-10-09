@@ -1,0 +1,65 @@
+
+/* ============================= */
+/* NAVBAR                         */
+/* ============================= */
+
+.dashboard-navbar {
+
+    margin-bottom: 18px;
+
+    padding:
+        6px
+        12px !important;
+
+    background-color: var(--white);
+
+    border-radius: 8px;
+
+    border:
+        1px solid var(--border);
+
+    box-shadow: var(--shadow);
+
+}
+
+
+.dashboard-navbar .navbar-brand {
+
+    color: var(--contec-blue-dark);
+
+    font-weight: 700;
+
+}
+
+
+.dashboard-navbar .nav-link {
+
+    padding:
+        12px
+        15px !important;
+
+    color: var(--contec-gray);
+
+    font-weight: 500;
+
+    border-bottom:
+        3px solid transparent;
+
+}
+
+
+.dashboard-navbar .nav-link:hover {
+
+    color: var(--contec-blue);
+
+}
+
+
+.dashboard-navbar .nav-link.active {
+
+    color: var(--contec-blue);
+
+    border-bottom-color:
+        var(--contec-orange);
+
+}

@@ -6,6 +6,9 @@ import DispositivosFiltros from "../components/DispositivosFiltros";
 import DispositivosTable from "../components/DispositivosTable";
 import "../styles/dispositivos.css";
 
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 const FILTROS_INICIALES = { busqueda: "", estado: "" };
 
 export default function Dispositivos() {
@@ -67,6 +70,19 @@ export default function Dispositivos() {
 
         <DispositivosTable dispositivos={dispositivosFiltrados} />
       </main>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition: Bounce
+        />
     </>
   );
 }

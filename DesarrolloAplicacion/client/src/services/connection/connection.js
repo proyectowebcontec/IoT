@@ -14,7 +14,8 @@ export const is_connected = async() => {
 
         return response.data;
     } catch (error) {
-        console.error("Error al verificar la salud de la API", error);
+        console.error("#####################################################Error al verificar la salud de la API", error);
+        console.error("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", error.response.data)
         throw error.response ? error.response.data : 'Error desconocido';
     }
 }
@@ -35,6 +36,7 @@ export const obtenerConteoDispositivos = async () => {
             console.error(error.response.data.error);
             return;
         }
+        console.log("----------------------------------", error.response)
         console.error("Error al contar dispositivos", error);
         throw error.response ? error.response.data.error : 'Error desconocido';
     }
@@ -193,6 +195,7 @@ export const obtenerPromedioVariable = async (idDispositivo, entrada, fechaInici
 
         return response.data
     } catch (error) {
+        console.log("----------------------------------", error.response)
         if (error.response?.status === 404) {
             console.error(`No se encontraron registros para calcular el promedio la entrada ${entrada} del dispositivo ${idDispositivo}.`);
             return;
@@ -231,12 +234,12 @@ export const enviarSMS = async (telefono) => {
     } catch (error) {
         if (error.response?.status === 500) {
             console.error(`No se pudo enviar la alarma al número ${telefono} en TR.`);
-            return;
+            throw error.response;
         } else if (error.response?.status === 400) {
             console.error(error.response.data.error);
-            return;
+            throw error.response.data.error;
         }
-        console.error(`Error al enviar mensaje de txto al número ${telefono}.`, error);
+        console.error(`Error al enviar mensaje de texto al número ${telefono}.`, error);
         throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };

@@ -7,6 +7,9 @@ import HistorialTable from "../components/HistorialTable";
 import { monitoreotoCSV } from "../utils/MonitoreotoCsv";
 import Service from '../services/Service';
 
+import { Bounce, toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const FILTROS_INICIALES = {
   dispositivoId: "",
   fechaInicio: "",
@@ -31,6 +34,7 @@ useEffect(() => {
         //console.log(metrics.dispositivos)
       } catch (error) {
         console.error("Error al contar dispositivos:", error);
+        toast.error("Error al contar los dispositivos.", {position: 'top-right'})
       }
       
     }
@@ -40,9 +44,10 @@ useEffect(() => {
         const estado = await Service.is_connected();
 
         setStatus(estado);
-        console.log(estado)
+        //console.log(estado)
       } catch (error) {
         console.error("Error al verificar salud de la API", error);
+        toast.error("Error: El sistema no está disponible.", { position: 'top-right' })
       }
     }
     
@@ -53,6 +58,11 @@ useEffect(() => {
 useEffect(() => {
     if(filtros.fechaInicio!=="" & filtros.fechaInicio !== "" & filtros.fechaFin!==""){
       //console.log("####################################################################")
+      if (filtros.dispositivoId === ''){
+        toast.error("Error: Debe indicar un dispositivo.", {position:'top-right'})
+        return;
+      }
+
       handleBuscar();
     }
   }, [filtros]);
@@ -66,10 +76,11 @@ useEffect(() => {
       const data = await Service.obtenerMonitoreos(filtros.dispositivoId, filtros.fechaInicio, filtros.fechaFin);
       //console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
       setRegistros(data);
-      console.log(data)
+      //console.log(data)
     } catch (error) {
       setRegistros([])
       console.error("Error al obtener monitoreos:", error);
+      toast.error(`Error:  Al consultar todos los monitoreos.`, { position: 'top-right' });
     } 
  };
 
@@ -78,7 +89,7 @@ useEffect(() => {
     setDescargando(true);
     try {
       if (!registros || registros.length === 0) {
-        alert("No hay registros para descargar en ese rango.");
+        toast.info("No hay registros para descargar en ese rango.",{position:'top-right'});
         return;
       }
 
@@ -93,9 +104,11 @@ useEffect(() => {
       a.download = `historial-${filtros.dispositivoId || "todos"}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+
+      toast.success("CSV generado con éxito", { position: 'top-right' })
     } catch (err) {
       console.error(err);
-      alert("Ocurrió un error al generar el CSV.");
+      toast.error("Ocurrió un error al generar el CSV.", { position: 'top-right' });
     } finally {
       setDescargando(false);
     }
@@ -125,6 +138,19 @@ useEffect(() => {
 
         <HistorialTable registros={registros} />
       </main>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition: Bounce
+        />
     </>
   );
 }

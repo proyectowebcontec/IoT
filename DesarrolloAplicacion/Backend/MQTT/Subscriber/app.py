@@ -119,11 +119,11 @@ def guardar_lote(lote: list[Monitoreo]) -> None:
         log.exception("Error al guardar lote de %d monitoreos", len(lote))
         return
 
-    for m in lote:
-        try:
-            cola_alarmas.put_nowait(m)
-        except queue.Full:
-            log.warning("Cola de alarmas llena; alarma omitida para %s", m.IDMonitoreo)
+    #for m in lote:
+     #   try:
+      #      cola_alarmas.put_nowait(m)
+       # except queue.Full:
+        #    log.warning("Cola de alarmas llena; alarma omitida para %s", m.IDMonitoreo)
 
 
 def worker_persistencia() -> None:
