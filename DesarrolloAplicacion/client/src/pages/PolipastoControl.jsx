@@ -3,7 +3,6 @@ import ControlPad from "../components/ControlPad";
 import VelocidadSlider from "../components/VelocidadSlider";
 import StatusList from "../components/StatusList";
 import HistorialMovimientos from "../components/HistorialMovimientos";
-import Header from "../components/Header";
 import DashboardNavbar from "../components/DashboardNavbar";
 import "../styles/polipasto.css";
 
@@ -41,7 +40,6 @@ export default function PolipastoControl({
 }) {
   return (
     <>
-      <Header></Header>
       <DashboardNavbar/>
       
       <div className="pol-page">

@@ -66,7 +66,7 @@
     color: #005b96;
   }
   
-  .pulse-effect {
+  .btn.pulse-effect {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), 0 3px 6px rgba(0, 0, 0, 0.1);
     margin-left: 12px;
     border: none;
@@ -78,7 +78,7 @@
     transition: transform 0.3s ease-in-out; /* Transición suave del efecto de pulsación */
   }
   
-  .pulse-effect:hover {
+  .btn.pulse-effect:hover {
     color: #fff;
     background-color: #dd791c; /* Cambia el color al pasar el cursor sobre el botón */
   }

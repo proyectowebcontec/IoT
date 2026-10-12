@@ -1,12 +1,11 @@
 import { useMemo, useState } from "react";
-import Header from "../components/Header";
 import DashboardNavbar from "../components/DashboardNavbar";
 import DispositivosResumen from "../components/DispositivosResumen";
 import DispositivosFiltros from "../components/DispositivosFiltros";
 import DispositivosTable from "../components/DispositivosTable";
 import "../styles/dispositivos.css";
 
-import { toast, ToastContainer } from "react-toastify";
+import { Bounce, toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const FILTROS_INICIALES = { busqueda: "", estado: "" };
@@ -52,24 +51,20 @@ export default function Dispositivos() {
 
   return (
     <>
-      <Header status={1}/>
-
-      <main className="content">
-        <div className="page-header">
-          <div>
-            <h1>Dispositivos</h1>
-            <p>Estado y mantenimiento de los dispositivos registrados.</p>
-          </div>
+      <div className="page-header">
+        <div>
+          <h1>Dispositivos</h1>
+          <p>Estado y mantenimiento de los dispositivos registrados.</p>
         </div>
+      </div>
 
-        <DashboardNavbar />
+      <DashboardNavbar />
 
-        <DispositivosResumen resumen={resumen} />
+      <DispositivosResumen resumen={resumen} />
 
-        <DispositivosFiltros filtros={filtros} onChange={handleFiltroChange} />
+      <DispositivosFiltros filtros={filtros} onChange={handleFiltroChange} />
 
-        <DispositivosTable dispositivos={dispositivosFiltrados} />
-      </main>
+      <DispositivosTable dispositivos={dispositivosFiltrados} />
       <ToastContainer 
         position="top-right"
         autoClose={3000}
@@ -81,7 +76,7 @@ export default function Dispositivos() {
         draggable
         pauseOnHover
         theme="dark"
-        transition: Bounce
+        transition={Bounce}
         />
     </>
   );

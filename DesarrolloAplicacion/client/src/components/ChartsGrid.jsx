@@ -2,7 +2,7 @@ import useChart from "../hooks/useChart";
 import { useState } from "react";
 import Service from '../services/Service';
 
-import { toast, ToastContainer } from "react-toastify";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 function ChartCard({ title, subtitle, config }) {
@@ -100,7 +100,7 @@ export default function ChartsGrid({ chartData }) {
         draggable
         pauseOnHover
         theme="dark"
-        transition: Bounce
+        transition= {Bounce}
         />
     </section>
   );

@@ -1,45 +1,54 @@
-import React, { useState} from 'react';
-import Dashboard from './Dashboard';
-import Historial from './Historial';
-import Dispositivos from './Dispositivos';
-import PolipastoControl from './PolipastoControl';
+import React, { useState, useEffect} from 'react';
+import DashboardNavbar from "../components/DashboardNavbar";
+import Header from "../components/Header";
+import Service from '../services/Service';
+import { Outlet } from 'react-router-dom';
 
-export default function DashboardClient() {
-    const [selectedSection, setSelectedSection] = useState('default'); // Estado inicial como 'default'
+import { Bounce, toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+export default function Administrador() {   
     //usuario en local estorage
-    const usuarioLogueado = JSON.parse(localStorage.getItem('usuario') || '{}');
+   // const usuarioLogueado = JSON.parse(localStorage.getItem('usuario') || '{}');
+    const [status, setStatus] = useState(0);
 
+   useEffect(() => {
+    const fetchStatus = async () => {
+        try {
+        const estado = await Service.is_connected();
 
-    // Función para renderizar el contenido basado en la sección seleccionada
-    const renderContent = () => {
-        switch (selectedSection) {
-            // primero deben crear el componente de cada una de las opciones
-            // luego deben importar el componente y agregarlo a la lista de opciones
-            // todo esto debe estar  en la carpeta components
-            case 'dashboard':
-                return <Dashboard/>;
-            case 'historial':
-                return <Historial/>;
-            case 'dispositivos':
-                return <Dispositivos/>;
-            case 'polipasto':
-                return <PolipastoControl />;
-            case 'default':
-            default:
-                return  null; // Mostrar Storage en el estado por defecto
+        setStatus(estado);
+        toast.success("Sistema activado exitósamente", { position: "top-right", });
+        } catch (error) {
+        console.error("Error al verificar salud de la API", error);
+        toast.error(`Error: El sistema no está disponible.`, { position: 'top-right' });
         }
-    };
+    }
+
+    fetchStatus()
+    }, []);
 
     // Condición para mostrar el botón: en 'storage' o en 'default'
 
     return (
-        <div className="dashboard-container">
-            <Navbar onSelect={setSelectedSection}/>
-            <div className="content">
-                <div className="card-section">
-                    {renderContent()}
-                </div>
-            </div>
-        </div>
+        <main className="content">
+
+            <Header status={status} />
+        
+            <Outlet /> 
+            <ToastContainer 
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+                transition={Bounce}
+            />
+        </main>
     );
 }

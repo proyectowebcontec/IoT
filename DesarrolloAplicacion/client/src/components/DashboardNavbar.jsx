@@ -1,18 +1,23 @@
 import { NavLink } from "react-router-dom";
 
-// Assumes react-router-dom is set up with routes:
-//   "/"                 -> Dashboard
-//   "/dispositivos"     -> Dispositivos
-//   "/historial"        -> Historial
-// Swap the NavLink "to" values for plain hrefs if you're not using a router.
+import { Bounce, toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function DashboardNavbar() {
   const linkClass = ({ isActive }) =>
     isActive ? "nav-link active" : "nav-link";
 
+  const handleLogout = () => {
+      localStorage.removeItem('usuario'); // Elimina el usuario logeado
+      console.log("FUERA!!!")
+      toast.success('Has cerrado sesión', {position: 'top-right'});
+  };
+
+
   return (
     <nav className="navbar navbar-expand-lg dashboard-navbar">
       <div className="container-fluid">
-        <NavLink className="navbar-brand" to="/">
+        <NavLink className="navbar-brand" to="/dashboardadmin">
           CONTEC IoT
         </NavLink>
 
@@ -30,21 +35,37 @@ export default function DashboardNavbar() {
 
         <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div className="navbar-nav">
-            <NavLink end className={linkClass} to="/" aria-current="page">
+            <NavLink end className={linkClass} to="/dashboardadmin" aria-current="page">
               Dashboard
             </NavLink>
-            <NavLink className={linkClass} to="/dispositivos">
+            <NavLink className={linkClass} to="/dashboardadmin/dispositivos">
               Dispositivos
             </NavLink>
-            <NavLink className={linkClass} to="/historial">
+            <NavLink className={linkClass} to="/dashboardadmin/historial">
               Historial
             </NavLink>
-            <NavLink className={linkClass} to="/simulador">
+            <NavLink className={linkClass} to="/dashboardadmin/simulador">
               Simulador ABUS
+            </NavLink>
+            <NavLink className={linkClass} to="/" onClick={handleLogout}>
+              Salir
             </NavLink>
           </div>
         </div>
       </div>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition= {Bounce}
+        />
     </nav>
   );
 }

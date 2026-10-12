@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Header from "../components/Header";
 import DashboardNavbar from "../components/DashboardNavbar";
 import HistorialFilters from "../components/HistorialFilters";
 import HistorialTable from "../components/HistorialTable";
@@ -116,9 +115,6 @@ useEffect(() => {
 
   return (
     <>
-      <Header status={status}/>
-
-      <main className="content">
         <div className="page-header">
           <div>
             <h1>Historial</h1>
@@ -137,7 +133,6 @@ useEffect(() => {
         />
 
         <HistorialTable registros={registros} />
-      </main>
       <ToastContainer 
         position="top-right"
         autoClose={3000}
@@ -149,7 +144,7 @@ useEffect(() => {
         draggable
         pauseOnHover
         theme="dark"
-        transition: Bounce
+        transition= {Bounce}
         />
     </>
   );

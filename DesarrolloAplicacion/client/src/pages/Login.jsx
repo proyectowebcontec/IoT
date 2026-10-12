@@ -45,7 +45,7 @@ export default function FormLogin() {
             //const response = await Service.LoginCredenciales(datos)
             // Guarda el id del usuario en localStorage antes de redirigir
             //localStorage.setItem('userId', response.userId)
-            navigate('/dashboard');
+            navigate('/dashboardadmin');
             
         } catch (err) {
             console.log(err);

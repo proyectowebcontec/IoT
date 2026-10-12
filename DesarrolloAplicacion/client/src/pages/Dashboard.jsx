@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-import Header from "../components/Header";
 import DashboardNavbar from "../components/DashboardNavbar";
 import FiltersPanel from "../components/FiltersPanel";
 import MetricCards from "../components/MetricCards";
@@ -24,7 +23,6 @@ const FILTROS_INICIALES = {
 const INTERVALO_MS = 1000;
 
 export default function Dashboard() {
-  const [status, setStatus] = useState(0);
   const [dispositivos, setDispositivos] = useState([]);
   const [isTiempoReal, setIsTiempoReal] = useState(false);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
@@ -83,21 +81,8 @@ export default function Dashboard() {
       }
       
     }
-
-    const fetchStatus = async () => {
-      try {
-        const estado = await Service.is_connected();
-
-        setStatus(estado);
-        toast.success("Sistema activado exitósamente", { position: "top-right", });
-      } catch (error) {
-        console.error("Error al verificar salud de la API", error);
-        toast.error(`Error: El sistema no está disponible.`, { position: 'top-right' });
-      }
-    }
     
     fetchDispositivos()
-    fetchStatus()
   }, []);
 
   useEffect(() => {
@@ -340,9 +325,6 @@ export default function Dashboard() {
 
   return (
     <>
-      <Header status={status} />
-
-      <main className="content">
         <div className="page-header">
           <div>
             <h1>Dashboard de monitoreo</h1>
@@ -360,12 +342,12 @@ export default function Dashboard() {
           onLimpiar={handleLimpiarFiltros}
         />
 
-        <MetricCards metrics={metrics} />
+      <MetricCards metrics={metrics} />
 
-        <AveragesGrid averages={averages} />
+      <AveragesGrid averages={averages} />
 
-        <ChartsGrid chartData={chartData} />
-      </main>
+      <ChartsGrid chartData={chartData} />
+    
       <ToastContainer 
         position="top-right"
         autoClose={3000}
@@ -377,7 +359,7 @@ export default function Dashboard() {
         draggable
         pauseOnHover
         theme="dark"
-        transition: Bounce
+        transition={Bounce}
         />
     </>
   );
