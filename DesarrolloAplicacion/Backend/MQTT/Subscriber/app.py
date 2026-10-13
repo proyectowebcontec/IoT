@@ -9,7 +9,8 @@ from uuid import uuid4
 import paho.mqtt.client as mqtt
 from pydantic import ValidationError
 
-from .configure import BROKER, PORT, TOPIC, CLIENT_ID
+import certifi
+from .configure import BROKER, PORT, TOPIC, CLIENT_ID, MQTT_USER, MQTT_PASSWORD
 from ..database.mongodb import monitoreos_collection
 from ..schemas.gateway151 import GatewayData
 from ..schemas.monitoreo import Medicion, Monitoreo
@@ -233,6 +234,8 @@ def main() -> None:
     signal.signal(signal.SIGTERM, lambda *_: detener.set())
 
     try:
+        client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
+        client.tls_set(ca_certs=certifi.where())
         client.connect(BROKER, PORT, keepalive=60)
         client.loop_start()
 
