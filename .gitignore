@@ -25,6 +25,7 @@ DesarrolloAplicacion/Backend/MQTT/database/__pycache__
 DesarrolloAplicacion/Backend/MQTT/schemas/__pycache__
 
 DesarrolloAplicacion/Backend/.env
+DesarrolloAplicacion/Backend/MQTT/Subscriber/AmazonRootCA1.pem
 
 DesarrolloAplicacion/Frontend/pages
 DesarrolloAplicacion/Frontend/js/components
