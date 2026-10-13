@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from models.errores import RecursoNoEncontradoError
-from schemas.dispositivos import Dispositivo
-from database.mongodb import monitoreos_collection
+from schemas.dispositivos import DispositivoResumen
+from database.mongodb import dispositivos_collection
 
 
 router = APIRouter(
@@ -10,23 +10,11 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[Dispositivo])
+@router.get("/", response_model=list[DispositivoResumen])
 def obtener_dispositivos():
 
     dispositivos = list(
-        monitoreos_collection.aggregate([
-            {
-                "$group": {
-                    "_id": "$IDDispositivo"
-                }
-            },
-            {
-                "$project": {
-                    "_id": 0,
-                    "IDDispositivo": "$_id"
-                }
-            }
-        ])
+        dispositivos_collection.find({}, {"empresa_id": 0, "canales": 0, "firmware": 0})
     )
 
     if not dispositivos:
@@ -40,10 +28,10 @@ def obtener_dispositivos():
 def obtener_count_dispositivos():
 
     resultado = list(
-        monitoreos_collection.aggregate([
+        dispositivos_collection.aggregate([
             {
                 "$group": {
-                    "_id": "$IDDispositivo"
+                    "_id": "$_id"
                 }
             },
             {
