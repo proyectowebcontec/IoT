@@ -1,5 +1,5 @@
 export default function FiltersPanel({
-  dispositivos, // [{ id, nombre }]
+  dispositivos, // [{"nombre": "string", "estado": "online","_id": "string","ultima_conexion": "2026-10-14T15:09:17.475Z"}]
   filtros, // { dispositivoId, periodo, fechaInicio, fechaFin }
   onChange, // (field, value) => void
   onAplicar, // () => void
@@ -33,8 +33,8 @@ export default function FiltersPanel({
           >
             <option value="">Todos los dispositivos</option>
             {dispositivos.map((d) => (
-              <option key={d.IDDispositivo} value={d.IDDispositivo}>
-                {d.IDDispositivo}
+              <option key={d._id} value={d._id}>
+                {d.nombre}
               </option>
             ))}
           </select>

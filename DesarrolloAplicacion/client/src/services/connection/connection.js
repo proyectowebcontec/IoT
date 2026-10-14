@@ -14,8 +14,7 @@ export const is_connected = async() => {
 
         return response.data;
     } catch (error) {
-        console.error("#####################################################Error al verificar la salud de la API", error);
-        console.error("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$", error.response.data)
+        console.error("Error al verificar la salud de la API", error);
         throw error.response ? error.response.data : 'Error desconocido';
     }
 }
@@ -134,20 +133,20 @@ export const obtenerDashboard = async (idDispositivo, entrada, fechaInicio, fech
     }
 };
 
-export const obtenerPromedioVariableTR = async (idDispositivo, entrada) => {
+export const obtenerPromedioVariableTR = async (idDispositivo) => {
     try {
-        const response = await connection.get(`/dashboard/promedio/${idDispositivo}/${entrada}`);
+        const response = await connection.get(`/dashboard/promedios/${idDispositivo}`);
 
         return response.data
     } catch (error) {
         if (error.response?.status === 404) {
-            console.error(`No se encontraron registros para calcular el promedio la entrada ${entrada} del dispositivo ${idDispositivo} en TR.`);
+            console.error(`No se encontraron registros para calcular el promedio del dispositivo ${idDispositivo} en TR.`);
             return;
         } else if (error.response?.status === 400) {
             console.error(error.response.data.error);
             return;
         }
-        console.error(`Error al calculr el promedio para la entrada ${entrada} del dispositivo ${idDispositivo} en TR.`, error);
+        console.error(`Error al calculr el promedio del dispositivo ${idDispositivo} en TR.`, error);
         throw error.response ? error.response.data.error : 'Error desconocido';
     }
 }
@@ -189,19 +188,19 @@ export const obtenerDashboardTR = async (idDispositivo, entrada) => {
     }
 };
 
-export const obtenerPromedioVariable = async (idDispositivo, entrada, fechaInicio, fechaFin) => {
+export const obtenerPromedioVariable = async (idDispositivo, fechaInicio, fechaFin) => {
     try {
-        const response = await connection.get(`/dashboard/promedio/${idDispositivo}/${entrada}/${fechaInicio}/${fechaFin}`);
+        const response = await connection.get(`/dashboard/promedio/${idDispositivo}/${fechaInicio}/${fechaFin}`);
 
         return response.data
     } catch (error) {
         console.log("----------------------------------", error.response)
         if (error.response?.status === 404) {
             console.error(`No se encontraron registros para calcular el promedio la entrada ${entrada} del dispositivo ${idDispositivo}.`);
-            return;
+            return [];
         } else if (error.response?.status === 400) {
             console.error(error.response.data.error);
-            return;
+            return [];
         }
         console.error(`Error al calculr el promedio para la entrada ${entrada} del dispositivo ${idDispositivo}.`, error);
         throw error.response ? error.response.data.error : 'Error desconocido';
@@ -243,3 +242,39 @@ export const enviarSMS = async (telefono) => {
         throw error.response ? error.response.data.error : 'Error desconocido';
     }
 };
+
+export const obtener_monitoreos_por_rango = async (idDispositivo, fechaInicio, fechaFin) => {
+    try {
+        const response = await connection.get(`/monitoreos/${idDispositivo}/${fechaInicio}/${fechaFin}`, {"limite": 3000});
+
+        return response.data
+    } catch (error) {
+        if (error.response?.status === 404) {
+            console.error(`No se encontraron registros de monitoreo para el dispositivo ${idDispositivo}.`);
+            return [];
+        } else if (error.response?.status === 400) {
+            console.error(error.response.data.error);
+            return [];
+        }
+        console.error(`Error al buscar registros para la entrada ${entrada} del dispositivo ${idDispositivo}.`, error);
+        throw error.response ? error.response.data.error : 'Error desconocido';
+    }
+}
+
+export const obtener_ultimos_monitoreos = async (idDispositivo) => {
+    try {
+        const response = await connection.get(`/monitoreos/${idDispositivo}`);
+
+        return response.data
+    } catch (error) {
+        if (error.response?.status === 404) {
+            console.error(`No se encontraron registros de monitoreo para el dispositivo ${idDispositivo}.`);
+            return [];
+        } else if (error.response?.status === 400) {
+            console.error(error.response.data.error);
+            return [];
+        }
+        console.error(`Error al buscar registros para la entrada ${entrada} del dispositivo ${idDispositivo}.`, error);
+        throw error.response ? error.response.data.error : 'Error desconocido';
+    }
+}
