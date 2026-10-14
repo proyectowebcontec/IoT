@@ -2,52 +2,18 @@ from datetime import datetime
 
 from fastapi import APIRouter, Query
 
-from database.mongodb import dispositivos_collection, monitoreos_collection
+from database.mongodb import monitoreos_collection
 from models.entradasensor import EntradaSensor
 from models.errores import RecursoNoEncontradoError
 from schemas.medicionpunto import MedicionPunto
 from schemas.monitoreo import MedicionOut, MonitoreoListado, MonitoreoOut
 from utils.validaciones import _validar_rango_fechas
+from utils.filtrado_enlace import _filtro_fechas, _obtener_catalogo
 
 router = APIRouter(
     prefix="/api/monitoreos",
     tags=["Monitoreos"]
 )
-
-
-# ---------------------------------------------------------------------------
-# Utilidades
-# ---------------------------------------------------------------------------
-def _obtener_catalogo(id_dispositivo: str) -> dict[int, dict]:
-    """
-    Devuelve el catálogo de canales del dispositivo indexado por id de canal:
-    { 1: {"descripcion": ..., "entrada": ..., "unidad": ...}, ... }
-    """
-    dispositivo = dispositivos_collection.find_one(
-        {"_id": id_dispositivo}, {"canales": 1}
-    )
-    if dispositivo is None:
-        raise RecursoNoEncontradoError(
-            f"No existe el dispositivo '{id_dispositivo}'"
-        )
-    return {
-        c["id"]: {
-            "descripcion": c.get("descripcion"),
-            "entrada": c.get("entrada"),
-            "unidad": c.get("unidad"),
-        }
-        for c in dispositivo.get("canales", [])
-    }
-
-
-def _filtro_fechas(desde: datetime | None, hasta: datetime | None) -> dict:
-    rango = {}
-    if desde:
-        rango["$gte"] = desde
-    if hasta:
-        rango["$lte"] = hasta
-    return {"fecha_monitoreo": rango} if rango else {}
-
 
 # ---------------------------------------------------------------------------
 # Listado general (paginado: con 10 lecturas no se puede traer todo)
@@ -167,6 +133,44 @@ def obtener_monitoreos_por_rango(
         raise RecursoNoEncontradoError(
             f"No hay mediciones para el dispositivo '{id_dispositivo}'"
         )
+
+    return [
+        MonitoreoOut(
+            fecha_monitoreo=d["fecha_monitoreo"],
+            dispositivo_id=d["meta"]["dispositivo_id"],
+            polipasto_id=str(d["meta"]["polipasto_id"]),
+            mediciones=[
+                MedicionOut(
+                    canal=m["canal"],
+                    valor=m["valor"],
+                    **catalogo.get(m["canal"], {}),
+                )
+                for m in d["mediciones"]
+            ],
+        )
+        for d in docs
+    ]
+
+@router.get("/{id_dispositivo}", response_model=list[MonitoreoOut])
+def obtener_ultimos_monitoreos(
+    id_dispositivo: str,
+    desde: datetime = Query(None),
+    limite: int = Query(500, ge=1, le=50000),
+):
+    catalogo = _obtener_catalogo(id_dispositivo)
+
+    docs = list(
+        monitoreos_collection.find({"meta.dispositivo_id": id_dispositivo, **_filtro_fechas(desde, None)})
+        .sort("fecha_monitoreo", -1)
+        .limit(limite)
+    )
+
+    if not docs:
+        raise RecursoNoEncontradoError(
+            f"No hay mediciones para el dispositivo '{id_dispositivo}'"
+        )
+
+    docs.reverse()  # de más antiguo a más reciente
 
     return [
         MonitoreoOut(

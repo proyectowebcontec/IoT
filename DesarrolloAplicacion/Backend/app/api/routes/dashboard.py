@@ -1,113 +1,19 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
-from database.mongodb import dispositivos_collection, monitoreos_collection
+from database.mongodb import monitoreos_collection
 from models.entradasensor import EntradaSensor
 from models.errores import RecursoNoEncontradoError
 from schemas.medicionpunto import MedicionPunto
-from schemas.responses import PromedioResponse, PulsosResponse
+from schemas.responses import PromedioResponse, PulsosResponse, PromediosResponse, PromedioCanalOut
 from utils.validaciones import _validar_rango_fechas
+from utils.filtrado_enlace import _resolver_canal_id, _puntos_canal, _agregar_canal, _obtener_catalogo
 
 router = APIRouter(
     prefix="/api/dashboard",
     tags=["Dashboard"]
 )
-
-
-# ---------------------------------------------------------------------------
-# Utilidades compartidas
-# ---------------------------------------------------------------------------
-def _resolver_canal_id(id_dispositivo: str, entrada: EntradaSensor) -> int:
-    """
-    En los monitoreos solo se guarda el id del canal; el nombre de la entrada
-    ("U0", etc.) vive en el catálogo del dispositivo. Aquí se traduce.
-    """
-    dispositivo = dispositivos_collection.find_one(
-        {"_id": id_dispositivo}, {"canales": 1}
-    )
-    if dispositivo is None:
-        raise RecursoNoEncontradoError(
-            f"No existe el dispositivo '{id_dispositivo}'"
-        )
-
-    for canal in dispositivo.get("canales", []):
-        if canal.get("entrada") == entrada.value:
-            return canal["id"]
-
-    raise RecursoNoEncontradoError(
-        f"El dispositivo '{id_dispositivo}' no tiene la entrada '{entrada.value}'"
-    )
-
-
-def _etapa_match(
-    id_dispositivo: str,
-    desde: datetime | None = None,
-    hasta: datetime | None = None,
-) -> dict:
-    filtro = {"meta.dispositivo_id": id_dispositivo}
-    rango = {}
-    if desde:
-        rango["$gte"] = desde
-    if hasta:
-        rango["$lte"] = hasta
-    if rango:
-        filtro["fecha_monitoreo"] = rango
-    return {"$match": filtro}
-
-
-def _agregar_canal(
-    id_dispositivo: str,
-    canal_id: int,
-    operador: str,                       # "$avg" o "$sum"
-    desde: datetime | None = None,
-    hasta: datetime | None = None,
-):
-    """
-    Aplica un acumulador ($avg, $sum) sobre los valores de un canal.
-    Devuelve el resultado o None si no hay mediciones.
-    """
-    resultado = list(
-        monitoreos_collection.aggregate([
-            _etapa_match(id_dispositivo, desde, hasta),
-            {"$unwind": "$mediciones"},
-            {"$match": {"mediciones.canal": canal_id}},
-            {"$group": {"_id": None, "resultado": {operador: "$mediciones.valor"}}},
-        ])
-    )
-    return resultado[0]["resultado"] if resultado else None
-
-
-def _puntos_canal(
-    id_dispositivo: str,
-    canal_id: int,
-    desde: datetime | None = None,
-    hasta: datetime | None = None,
-    ultimos: int | None = None,
-):
-    """Serie (fecha, valor) de un canal, en orden cronológico."""
-    pipeline = [_etapa_match(id_dispositivo, desde, hasta)]
-
-    if ultimos:
-        # Cada documento trae una medición por canal, así que limitar los
-        # documentos ANTES del unwind equivale a limitar los puntos
-        # y evita desenrollar toda la colección.
-        pipeline += [
-            {"$sort": {"fecha_monitoreo": -1}},
-            {"$limit": ultimos},
-        ]
-
-    pipeline += [
-        {"$unwind": "$mediciones"},
-        {"$match": {"mediciones.canal": canal_id}},
-        {"$project": {
-            "_id": 0,
-            "fecha": "$fecha_monitoreo",
-            "valor": "$mediciones.valor",
-        }},
-        {"$sort": {"fecha": 1}},
-    ]
-    return list(monitoreos_collection.aggregate(pipeline))
 
 
 # ---------------------------------------------------------------------------
@@ -117,7 +23,7 @@ def _puntos_canal(
 def obtener_historial_entrada(id_dispositivo: str, entrada: EntradaSensor):
 
     canal_id = _resolver_canal_id(id_dispositivo, entrada)
-    mediciones = _puntos_canal(id_dispositivo, canal_id, ultimos=50)
+    mediciones = _puntos_canal(id_dispositivo, canal_id, ultimos=500)
 
     if not mediciones:
         raise RecursoNoEncontradoError(
@@ -149,6 +55,70 @@ def obtener_mediciones_entrada_fecha(
 # ---------------------------------------------------------------------------
 # Promedio
 # ---------------------------------------------------------------------------
+@router.get("/promedios/{id_dispositivo}", response_model=PromediosResponse)
+def obtener_promedios_dispositivo(
+    id_dispositivo: str,
+    limite: int = Query(500, ge=1, le=50000),
+    horas: int | None = Query(None, ge=1, le=168),
+):
+    catalogo = _obtener_catalogo(id_dispositivo)
+    filtro = {"meta.dispositivo_id": id_dispositivo}
+
+    if horas is not None:
+        # Modo ventana de tiempo
+        desde = datetime.now(timezone.utc) - timedelta(hours=horas)
+        filtro["fecha_monitoreo"] = {"$gte": desde}
+        etapas_ventana = []
+        ventana = f"ultimas_{horas}_horas"
+    else:
+        # Modo últimos N registros
+        etapas_ventana = [
+            {"$sort": {"fecha_monitoreo": -1}},
+            {"$limit": limite},
+        ]
+        ventana = f"ultimos_{limite}_registros"
+
+    pipeline = [
+        {"$match": filtro},
+        *etapas_ventana,
+        {"$facet": {
+            "total": [{"$count": "n"}],
+            "por_canal": [
+                {"$unwind": "$mediciones"},
+                {"$group": {
+                    "_id": "$mediciones.canal",
+                    "promedio": {"$avg": "$mediciones.valor"},
+                    "muestras": {"$sum": 1},
+                }},
+                {"$sort": {"_id": 1}},
+            ],
+        }},
+    ]
+
+    resultado = next(monitoreos_collection.aggregate(pipeline), None)
+    por_canal = resultado["por_canal"] if resultado else []
+    total = resultado["total"][0]["n"] if resultado and resultado["total"] else 0
+
+    if not por_canal:
+        raise RecursoNoEncontradoError(
+            f"No hay mediciones para el dispositivo '{id_dispositivo}'"
+        )
+
+    return PromediosResponse(
+        IDDispositivo=id_dispositivo,
+        ventana=ventana,
+        registros=total,
+        promedios=[
+            PromedioCanalOut(
+                canal=c["_id"],
+                promedio=c["promedio"],
+                muestras=c["muestras"],
+                **catalogo.get(c["_id"], {}),
+            )
+            for c in por_canal
+        ],
+    )
+
 @router.get("/promedio/{id_dispositivo}/{entrada}", response_model=PromedioResponse)
 def obtener_promedio_entrada(id_dispositivo: str, entrada: EntradaSensor):
 
@@ -166,6 +136,38 @@ def obtener_promedio_entrada(id_dispositivo: str, entrada: EntradaSensor):
         entrada=entrada,
         promedio=promedio
     )
+
+
+@router.get("/promedio/{id_dispositivo}/{f_inicio}/{f_fin}", response_model=list[PromedioResponse])
+def obtener_promedio_entrada_fecha(
+    id_dispositivo: str, f_inicio: datetime, f_fin: datetime
+):
+
+    _validar_rango_fechas(f_inicio, f_fin)
+
+    catalogo = _obtener_catalogo(id_dispositivo)
+    # print(catalogo[1]["entrada"])
+    promedios = []
+
+    # Las variables a las que se les está calculando el promedio corresponden a U1, U2 y U3, sus ID son 1-3
+    # Ajustar según necesidad
+    for i in range(1, 4):
+        promedio = _agregar_canal(id_dispositivo, i, "$avg", f_inicio, f_fin)
+        promedio_format = PromedioResponse(
+                            IDDispositivo=id_dispositivo,
+                            entrada=catalogo[i]["entrada"],
+                            promedio=promedio
+                          )
+        promedios.append(promedio_format)
+
+
+    if promedio is None:
+        raise RecursoNoEncontradoError(
+            f"No hay mediciones para el dispositivo '{id_dispositivo}' "
+            f"entre '{f_inicio}' y '{f_fin}'"
+        )
+
+    return promedios
 
 
 @router.get("/promedio/{id_dispositivo}/{entrada}/{f_inicio}/{f_fin}", response_model=PromedioResponse)
