@@ -64,7 +64,7 @@ useEffect(() => {
   
       const fetchDispositivos = async () => {
         try {
-          const resDispositivos = await Service.obtener_dispositivos_ubicacion(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
+          const resDispositivos = await Service.obtener_dispositivos_resumen(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
   
           setDispositivos(resDispositivos)
         } catch (error) {
@@ -97,9 +97,9 @@ useEffect(() => {
             next[hijo] = "";
           });
         }
-
         return next;
       });
+      return;
     }
 
     setFiltros((prev) => ({ ...prev, [field]: value }));

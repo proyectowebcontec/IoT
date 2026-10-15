@@ -1,27 +1,91 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import DashboardNavbar from "../components/DashboardNavbar";
 import DispositivosResumen from "../components/DispositivosResumen";
 import DispositivosFiltros from "../components/DispositivosFiltros";
 import DispositivosTable from "../components/DispositivosTable";
 import "../styles/dispositivos.css";
 
+import Service from "../services/Service";
+
 import { Bounce, toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const FILTROS_INICIALES = { busqueda: "", estado: "" };
+const FILTROS_INICIALES = { 
+  empresaId: "",
+  sucursalId: "",
+  areaId: "",
+  naveId: "",
+  busqueda: "", 
+  estado: "" 
+};
+
+const JERARQUIA = ["empresaId", "sucursalId", "areaId", "naveId", "dispositivoId"];
 
 export default function Dispositivos() {
   // TODO: reemplazar con tu fetch real, ej.
-  // const [dispositivos, setDispositivos] = useState([]);
+  const [dispositivos, setDispositivos] = useState([]);
   // useEffect(() => { fetchDispositivos().then(setDispositivos); }, []);
-  const [dispositivos] = useState([
-    { id: 1, nombre: "Gateway WHG 151", conectado: true, ultimoMantenimiento: "12/08/2026", ultimaConexion: "Hace 3 min" },
-    { id: 2, nombre: "Gateway NE 206", conectado: false, ultimoMantenimiento: "02/07/2026", ultimaConexion: "Hace 2 días" },
-  ]);
-
+  const [arbol, setArbol] = useState([]);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
 
+  // Cargar la lista de empresas igual que en Dashboard.jsx
+  useEffect(() => {
+    const fetchEmpresas = async () => {
+      try {
+        const arbolEmpresas = await Service.obtener_arbol_empresas();
+        setArbol(arbolEmpresas);
+      } catch (error) {
+        console.error("Error al consultar empresas registradas:", error);
+        toast.error(`Error: No se encontraron empresas registradas.`, { position: 'top-right' });
+      }
+    }
+    fetchEmpresas();
+  }, []);
+
+// -------------------------------------------------------------------------
+//       CARGA DINAMICA DE LOS DISPOSITIVOS
+// -------------------------------------------------------------------------
+  useEffect(() => {
+
+    const fetchDispositivos = async () => {
+      try {
+        const resDispositivos = await Service.obtenerDispositivosAbsolutos(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
+
+        setDispositivos(resDispositivos)
+      } catch (error) {
+        console.error("Error al listar dispositivos:", error);
+        toast.error(`Error: No se encontraron dispositivos.`, { position: 'top-right' });
+      }
+      
+    }
+
+    if (!filtros.empresaId){
+      return;
+    }
+
+    fetchDispositivos();
+    
+  }, [filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId, filtros.dispositivoId]);
+
   const handleFiltroChange = (field, value) => {
+    // Si el usuario modifica Empresa, sucursal, area o nave a mano, los que
+    // están por debajo en la jerarquía deben reestablecerse
+    if (field !== "dispositivoId" && !field.startsWith("fecha")){
+      setFiltros((prev) => {
+        const next = { ...prev, [field]: value };
+
+        // Reinicia todos los niveles por debajo del campo modificado
+        const idx = JERARQUIA.indexOf(field);
+        if (idx !== -1) {
+          JERARQUIA.slice(idx + 1).forEach((hijo) => {
+            next[hijo] = "";
+          });
+        }
+        return next;
+      });
+      return;
+    }
+
     setFiltros((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -33,8 +97,9 @@ export default function Dispositivos() {
 
       const coincideEstado =
         filtros.estado === "" ||
-        (filtros.estado === "conectado" && d.conectado) ||
-        (filtros.estado === "desconectado" && !d.conectado);
+        (filtros.estado === "online" && d.estado === "online") ||
+        (filtros.estado === "offline" && d.estado === "offline") ||
+        (filtros.estado === "mantenimiento" && d.estado === "mantenimiento");
 
       return coincideNombre && coincideEstado;
     });
@@ -43,8 +108,9 @@ export default function Dispositivos() {
   const resumen = useMemo(
     () => ({
       total: dispositivos.length,
-      conectados: dispositivos.filter((d) => d.conectado).length,
-      desconectados: dispositivos.filter((d) => !d.conectado).length,
+      conectados: dispositivos.filter((d) => d.estado === "online").length,
+      desconectados: dispositivos.filter((d) => d.estado === "offline").length,
+      mantenimiento: dispositivos.filter((d) => d.estado === "mantenimiento").length,
     }),
     [dispositivos]
   );
@@ -62,7 +128,7 @@ export default function Dispositivos() {
 
       <DispositivosResumen resumen={resumen} />
 
-      <DispositivosFiltros filtros={filtros} onChange={handleFiltroChange} />
+      <DispositivosFiltros empresas={arbol} filtros={filtros} onChange={handleFiltroChange} />
 
       <DispositivosTable dispositivos={dispositivosFiltrados} />
       <ToastContainer 

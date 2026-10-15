@@ -75,8 +75,31 @@ def contar_dispositivos_por_ubicacion(
 # ---------------------------------------------------------------------------
 # Listado
 # ---------------------------------------------------------------------------
-@router.get("/ubicacion", response_model=list[DispositivoOut])
-def listar_dispositivos_por_ubicacion(
+@router.get("/", response_model=list[DispositivoResumen]) # completo, paginado, con estado
+def obtener_dispositivos(
+    empresa_id: str,
+    sucursal_id: str | None = None,
+    area_id: str | None = None,
+    nave_id: str | None = None
+):
+
+    filtro = _filtro_dispositivos_en_ubicacion(
+        empresa_id, sucursal_id, area_id, nave_id, None
+    )
+
+    dispositivos = list(
+        dispositivos_collection.find(filtro, {"empresa_id": 0, "canales": 0, "firmware": 0})
+    )
+
+    if not dispositivos:
+        raise RecursoNoEncontradoError(
+            f"No hay dispositivos registrados."
+        )
+
+    return dispositivos
+
+@router.get("/resumen", response_model=list[DispositivoOut])
+def listar_dispositivos_por_ubicacion( # liviano, para selects/combos
     empresa_id: str,
     sucursal_id: str | None = None,
     area_id: str | None = None,
@@ -102,20 +125,6 @@ def listar_dispositivos_por_ubicacion(
     
     return docs
 
-
-@router.get("/", response_model=list[DispositivoResumen])
-def obtener_dispositivos():
-
-    dispositivos = list(
-        dispositivos_collection.find({}, {"empresa_id": 0, "canales": 0, "firmware": 0})
-    )
-
-    if not dispositivos:
-        raise RecursoNoEncontradoError(
-            f"No hay dispositivos registrados."
-        )
-
-    return dispositivos
 
 @router.get("/count")
 def obtener_count_dispositivos():

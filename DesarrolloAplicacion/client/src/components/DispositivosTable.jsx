@@ -1,14 +1,17 @@
 function EstadoBadge({ conectado }) {
   return (
-    <span className={`device-status ${conectado ? "device-status--online" : "device-status--offline"}`}>
+    <span className={`device-status ${conectado === "online" ? "device-status--online" : conectado === "offline" ? "device-status--offline": "device-status--mantenimiento"}`}>
       <span className="device-status-dot" />
-      {conectado ? "Conectado" : "Desconectado"}
+      {conectado === "online" ? "Conectado" : conectado === "offline" ? "Desconectado" : "Mantenimiento"}
     </span>
   );
 }
 
-// dispositivos: [{ id, nombre, conectado, ultimoMantenimiento, ultimaConexion }]
+// dispositivos: [{ id, nombre, estado, ultimoMantenimiento, ultima_conexion }]
 export default function DispositivosTable({ dispositivos }) {
+
+  const fmtFecha = new Intl.DateTimeFormat('es-GT', { dateStyle: 'short', timeStyle: 'medium' });
+
   return (
     <section className="section-block">
       <div className="section-header">
@@ -40,9 +43,9 @@ export default function DispositivosTable({ dispositivos }) {
               dispositivos.map((d) => (
                 <tr key={d.id}>
                   <td>{d.nombre}</td>
-                  <td><EstadoBadge conectado={d.conectado} /></td>
+                  <td><EstadoBadge conectado={d.estado} /></td>
                   <td>{d.ultimoMantenimiento ?? "—"}</td>
-                  <td>{d.ultimaConexion ?? "—"}</td>
+                  <td>{fmtFecha.format(new Date(d.ultima_conexion)) ?? "—"}</td>
                 </tr>
               ))
             )}
