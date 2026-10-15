@@ -58,3 +58,25 @@ class EmpresaCreate(EmpresaBase):
 class EmpresaResumen(EmpresaBase):
     id: PyObjectId = Field(alias="_id")
     activa: bool
+
+class NaveOpcion(BaseModel):
+    id: str
+    nombre: str
+
+
+class AreaOpcion(BaseModel):
+    id: str
+    nombre: str
+    naves: list[NaveOpcion] = []
+
+
+class SucursalOpcion(BaseModel):
+    id: str
+    nombre: str
+    areas: list[AreaOpcion] = []
+
+
+class EmpresaOpcion(BaseModel):
+    id: str
+    nombre: str
+    sucursales: list[SucursalOpcion] = []

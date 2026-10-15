@@ -29,5 +29,6 @@ class DispositivoResumen(DispositivoBase):
     id: str = Field(alias="_id")
     ultima_conexion: datetime
     
-class Dispositivo(BaseModel):
-    IDDispositivo: str
+class DispositivoOut(BaseModel):
+    id: str
+    nombre: str

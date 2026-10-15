@@ -1,12 +1,13 @@
 from datetime import datetime
+from bson import ObjectId
+from fastapi import APIRouter, Query, HTTPException
 
-from fastapi import APIRouter, Query
-
-from database.mongodb import monitoreos_collection
+from database.mongodb import monitoreos_collection, polipastos_collection, dispositivos_collection
 from models.entradasensor import EntradaSensor
 from models.errores import RecursoNoEncontradoError
 from schemas.medicionpunto import MedicionPunto
 from schemas.monitoreo import MedicionOut, MonitoreoListado, MonitoreoOut
+from schemas.dispositivos import EstadoDispositivo
 from utils.validaciones import _validar_rango_fechas
 from utils.filtrado_enlace import _filtro_fechas, _obtener_catalogo
 
@@ -14,6 +15,59 @@ router = APIRouter(
     prefix="/api/monitoreos",
     tags=["Monitoreos"]
 )
+
+# ---------------------------------------------------------------------------
+# Utilidades
+# ---------------------------------------------------------------------------
+def _a_objectid(valor: str, nombre: str) -> ObjectId:
+    if not ObjectId.is_valid(valor):
+        raise HTTPException(status_code=422, detail=f"'{nombre}' no es un id válido")
+    return ObjectId(valor)
+
+
+def _filtro_dispositivos_en_ubicacion(
+    empresa_id: str,
+    sucursal_id: str | None,
+    area_id: str | None,
+    nave_id: str | None,
+    estado: EstadoDispositivo | None,
+) -> dict:
+    """
+    Arma el filtro sobre `dispositivos` para una ubicación:
+    1. Busca en `polipastos` los que están en esa ubicación y tienen
+       un dispositivo asignado.
+    2. Devuelve el filtro por esos ids de dispositivo (_id string).
+    La empresa es obligatoria; sucursal, área y nave acotan cada vez más.
+    """
+    filtro_polipastos = {
+        "ubicacion.empresa_id": _a_objectid(empresa_id, "empresa_id"),
+        "dispositivo_id": {"$type": "string"},     # ignora polipastos sin dispositivo
+    }
+    if sucursal_id:
+        filtro_polipastos["ubicacion.sucursal_id"] = _a_objectid(sucursal_id, "sucursal_id")
+    if area_id:
+        filtro_polipastos["ubicacion.area_id"] = _a_objectid(area_id, "area_id")
+    if nave_id:
+        filtro_polipastos["ubicacion.nave_id"] = _a_objectid(nave_id, "nave_id")
+
+    ids_dispositivos = [
+        p["dispositivo_id"]
+        for p in polipastos_collection.find(filtro_polipastos, {"dispositivo_id": 1})
+    ]
+
+    preFiltro = {"_id": {"$in": ids_dispositivos}}
+
+    if estado:
+        preFiltro["estado"] = estado.value
+
+    ids_dispositivos2 = [
+            p["_id"]
+            for p in dispositivos_collection.find(preFiltro, {"_id": 1})
+        ]
+
+    filtro = {"meta.dispositivo_id": {"$in": ids_dispositivos2}}
+
+    return filtro
 
 # ---------------------------------------------------------------------------
 # Listado general (paginado: con 10 lecturas no se puede traer todo)
@@ -46,8 +100,23 @@ def listar_monitoreos(
 # Conteo (no carga los documentos en memoria)
 # ---------------------------------------------------------------------------
 @router.get("/count")
-def obtener_count_monitoreos(id_dispositivo: str | None = None):
-    filtro = {"meta.dispositivo_id": id_dispositivo} if id_dispositivo else {}
+def obtener_count_monitoreos(
+    empresa_id: str,
+    sucursal_id: str | None = None,
+    area_id: str | None = None,
+    nave_id: str | None = None,
+    id_dispositivo: str | None = None,
+    estado: EstadoDispositivo | None = None):
+
+    if id_dispositivo:
+        filtro = {"meta.dispositivo_id": id_dispositivo}
+    else:
+        filtro = _filtro_dispositivos_en_ubicacion(
+            empresa_id, sucursal_id, area_id, nave_id, estado
+        )
+
+    print("FILTRO #########", filtro)
+    
     return {"total_monitoreos": monitoreos_collection.count_documents(filtro)}
 
 

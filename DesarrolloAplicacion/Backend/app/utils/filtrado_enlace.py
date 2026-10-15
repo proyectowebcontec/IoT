@@ -1,4 +1,5 @@
 from datetime import datetime
+from bson import ObjectId
 from database.mongodb import dispositivos_collection, monitoreos_collection
 from models.errores import RecursoNoEncontradoError
 from models.entradasensor import EntradaSensor

@@ -38,7 +38,7 @@ def login(email: str, password: str):
     # extraer usuario de la BD
     user = usuarios_collection.find_one({ "email": email })
 
-    if not user:
+    if not user or not user['activo']:
         return {
             "_id": "6acd101e92ef3900c59403e2",
             "nombre": "",
