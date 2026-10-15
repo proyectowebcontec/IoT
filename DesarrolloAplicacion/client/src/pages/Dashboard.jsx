@@ -91,7 +91,7 @@ export default function Dashboard() {
 
         const noMonitoreos = await Service.obtenerNoMonitoreos(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId, filtros.dispositivoId);
 
-        const resDispositivos = await Service.obtener_dispositivos_ubicacion(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
+        const resDispositivos = await Service.obtener_dispositivos_resumen(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
 
         //console.log(resDispositivos)
         setMetrics(prev => ({
