@@ -345,6 +345,25 @@ body {
 
 }
 
+.filters-pre-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr
+        1.2fr
+        1fr
+        1fr
+        auto;
+
+    gap: 15px;
+
+    align-items: end;
+
+    padding-bottom: 15px;
+
+}
+
 
 .filters-grid {
 
@@ -839,6 +858,13 @@ body {
 
 @media (max-width: 1200px) {
 
+    .filters-pre-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
     .filters-grid {
 
         grid-template-columns:
@@ -905,6 +931,12 @@ body {
         flex-direction: column;
 
         align-items: flex-start;
+
+    }
+
+    .filters-pre-grid {
+
+        grid-template-columns: 1fr;
 
     }
 

@@ -41,9 +41,11 @@ export const obtenerConteoDispositivos = async () => {
     }
 };
 
-export const obtenerNoMonitoreos = async () => {
+export const obtenerNoMonitoreos = async (empresa_id, sucursal_id = null, area_id = null, nave_id = null, id_dispositivo = null, estado = "online") => {
     try {
-        const response = await connection.get('/monitoreos/count');
+        const response = await connection.get('/monitoreos/count', {
+            params: { empresa_id, sucursal_id, area_id, nave_id, estado, id_dispositivo }
+        });
 
         return response.data;
 
@@ -60,7 +62,7 @@ export const obtenerNoMonitoreos = async () => {
     }
 };
 
-export const obtenerDispositivos = async () => {
+export const obtenerDispositivosAbsolutos = async () => {
     try {
         const response = await connection.get('/dispositivos');
 
@@ -79,7 +81,7 @@ export const obtenerDispositivos = async () => {
 
 };
 
-export const obtenerMonitoreos = async (idDispositivo, fechaInicio, fechaFin) => {
+export const obtenerMonitoreosAbsolutos = async (idDispositivo, fechaInicio, fechaFin) => {
     try {
         const response = await connection.get(`/monitoreos/${idDispositivo}/${fechaInicio}/${fechaFin}`);
 
@@ -275,6 +277,63 @@ export const obtener_ultimos_monitoreos = async (idDispositivo) => {
             return [];
         }
         console.error(`Error al buscar registros para la entrada ${entrada} del dispositivo ${idDispositivo}.`, error);
+        throw error.response ? error.response.data.error : 'Error desconocido';
+    }
+}
+
+export const obtener_arbol_empresas = async () => {
+    try {
+        const response = await connection.get(`/empresas/arbol`);
+
+        return response.data
+    } catch (error) {
+        if (error.response?.status === 404) {
+            console.error(`No se encontraron empresas registradas.`);
+            return [];
+        } else if (error.response?.status === 400) {
+            console.error(error.response.data.error);
+            return [];
+        }
+        console.error(`Error al buscar empresas registradas.`, error);
+        throw error.response ? error.response.data.error : 'Error desconocido';
+    }
+}
+
+export const obtener_conteo_ubicacion = async (
+    empresa_id, sucursal_id = null, area_id = null, nave_id = null, estado = "online"
+) => {
+    try {
+        const response = await connection.get(`/dispositivos/ubicacion/count`, {
+            params: { empresa_id, sucursal_id, area_id, nave_id, estado }
+        });
+
+        return response.data;
+    } catch (error) {
+        if (error.response?.status === 404) {
+            console.error(`No se encontraron dispositivos registrados.`);
+            return { total_dispositivos: 0 };
+        }
+        console.error(`Error al buscar dispositivos registrados.`, error);
+        throw error.response?.data?.detail ?? error.response?.data?.error ?? 'Error desconocido';
+    }
+}
+
+export const obtener_dispositivos_ubicacion = async (empresa_id, sucursal_id = null, area_id = null, nave_id = null, estado = "online") => {
+    try {
+        const response = await connection.get(`/dispositivos/ubicacion`, {
+            params: { empresa_id, sucursal_id, area_id, nave_id, estado }
+        });
+
+        return response.data
+    } catch (error) {
+        if (error.response?.status === 404) {
+            console.error(`No se encontraron las ubicaciones para dispositivos registradas.`);
+            return [];
+        } else if (error.response?.status === 400) {
+            console.error(error.response.data.error);
+            return [];
+        }
+        console.error(`Error: No se encontraron las ubicaciones para dispositivos registradas.`, error);
         throw error.response ? error.response.data.error : 'Error desconocido';
     }
 }

@@ -14,6 +14,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 const FILTROS_INICIALES = {
+  empresaId: "",
+  sucursalId: "",
+  areaId: "",
+  naveId: "",
   dispositivoId: "",
   periodo: "",
   fechaInicio: "",
@@ -22,8 +26,11 @@ const FILTROS_INICIALES = {
 
 const INTERVALO_MS = 1000;
 
+const JERARQUIA = ["empresaId", "sucursalId", "areaId", "naveId", "dispositivoId"];
+
 export default function Dashboard() {
   const [dispositivos, setDispositivos] = useState([]);
+  const [arbol, setArbol] = useState([]);
   const [isTiempoReal, setIsTiempoReal] = useState(false);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
   const [metrics, setMetrics] = useState({
@@ -56,22 +63,40 @@ export default function Dashboard() {
   const ultimaVentanaRef = useRef(null);
 
 // -------------------------------------------------------------------------
-//       CARGA INICIAL DE LOS DATOS GENERALES (dispositivos, cantidad de dispositivos y registros)
+//       CARGA INICIAL DE LOS DATOS GENERALES (empresas, sucursales, áreas y naves)
+// -------------------------------------------------------------------------
+  useEffect(() => {
+    const fetchEmpresas = async () => {
+      try {
+        const arbolEmpresas = await Service.obtener_arbol_empresas();
+        setArbol(arbolEmpresas);
+      } catch (error) {
+        console.error("Error al consultar empresas registradas:", error);
+        toast.error(`Error: No se encontraron empresas registradas.`, { position: 'top-right' });
+      }
+      
+    }
+
+    fetchEmpresas();
+  }, []);
+
+// -------------------------------------------------------------------------
+//       CARGA DINAMICA DE LOS DATOS GENERALES (dispositivos, cantidad de dispositivos y registros)
 // -------------------------------------------------------------------------
   useEffect(() => {
 
     const fetchDispositivos = async () => {
       try {
-        const noDispositivos = await Service.obtenerConteoDispositivos();
+        const noDispositivos = await Service.obtener_conteo_ubicacion(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
 
-        const noMonitoreos = await Service.obtenerNoMonitoreos();
+        const noMonitoreos = await Service.obtenerNoMonitoreos(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId, filtros.dispositivoId);
 
-        const resDispositivos = await Service.obtenerDispositivos();
+        const resDispositivos = await Service.obtener_dispositivos_ubicacion(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
 
         //console.log(resDispositivos)
         setMetrics(prev => ({
           ...prev,
-          dispositivos: noDispositivos.totalDispositivos,
+          dispositivos: noDispositivos.total_dispositivos,
           registros: noMonitoreos.total_monitoreos
         }));
 
@@ -83,9 +108,14 @@ export default function Dashboard() {
       }
       
     }
+
+    if (!filtros.empresaId){
+      return;
+    }
+
+    fetchDispositivos();
     
-    fetchDispositivos()
-  }, []);
+  }, [filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId, filtros.dispositivoId]);
 
 // -------------------------------------------------------------------------
 //       CARGA EN TIEMPO REAL (graficos, promedios y cantidades)
@@ -123,7 +153,7 @@ export default function Dashboard() {
         avgData,
         dataU1,
       ] = await Promise.all([
-        Service.obtenerNoMonitoreos(),
+        Service.obtenerNoMonitoreos(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId, dispositivoId),
         Service.obtenerConteoPulsacionesTR(dispositivoId, "DI3"),
         Service.obtenerPromedioVariableTR(dispositivoId),
         Service.obtener_ultimos_monitoreos(dispositivoId),
@@ -205,6 +235,24 @@ export default function Dashboard() {
       return;
     }
 
+    // Si el usuario modifica Empresa, sucursal, area o nave a mano, los que
+    // están por debajo en la jerarquía deben reestablecerse
+    if (field !== "dispositivoId"){
+      setFiltros((prev) => {
+        const next = { ...prev, [field]: value };
+
+        // Reinicia todos los niveles por debajo del campo modificado
+        const idx = JERARQUIA.indexOf(field);
+        if (idx !== -1) {
+          JERARQUIA.slice(idx + 1).forEach((hijo) => {
+            next[hijo] = "";
+          });
+        }
+
+        return next;
+      });
+    }
+
     setFiltros((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -212,7 +260,7 @@ export default function Dashboard() {
     setFiltros(FILTROS_INICIALES);
   };
 
-   function extraerDatos(respuesta) {
+  function extraerDatos(respuesta) {
     const porEntrada = {};
 
     for (const lectura of respuesta) {
@@ -331,6 +379,7 @@ export default function Dashboard() {
         <DashboardNavbar />
 
         <FiltersPanel
+          empresas={arbol}
           dispositivos={dispositivos}
           filtros={filtros}
           onChange={handleFiltroChange}
