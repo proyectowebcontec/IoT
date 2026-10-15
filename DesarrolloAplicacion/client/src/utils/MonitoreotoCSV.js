@@ -5,11 +5,11 @@ export function monitoreotoCSV(monitoreos, opciones = {}) {
     return '';
   }
 
-  const columnasFijas = ['IDMonitoreo', 'IDDispositivo', 'FechaMonitoreo', 'FechaCargaDB'];
+  const columnasFijas = ['ID','IDDispositivo', 'IDPolipasto', 'FechaMonitoreo', 'FechaCarga'];
 
   const entradasSet = new Set();
   for (const m of monitoreos) {
-    for (const med of m.Mediciones || []) {
+    for (const med of m.mediciones || []) {
       entradasSet.add(med.entrada);
     }
   }
@@ -28,15 +28,16 @@ export function monitoreotoCSV(monitoreos, opciones = {}) {
 
   const filas = monitoreos.map((m) => {
     const valoresPorEntrada = {};
-    for (const med of m.Mediciones || []) {
+    for (const med of m.mediciones || []) {
       valoresPorEntrada[med.entrada] = med.valor;
     }
 
     const fila = [
-      m.IDMonitoreo,
-      m.IDDispositivo,
-      m.FechaMonitoreo,
-      m.FechaCargaDB,
+      m.id,
+      m.dispositivo_id,
+      m.polipasto_id,
+      m.fecha_monitoreo,
+      m.fecha_carga,
       ...columnasMediciones.map((entrada) => valoresPorEntrada[entrada]),
     ];
 
