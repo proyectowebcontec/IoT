@@ -49,6 +49,14 @@ class MonitoreoOut(BaseModel):
     polipasto_id: str
     mediciones: list[MedicionOut]
 
+class MonitoreoOutReporte(BaseModel):
+    id: str
+    fecha_monitoreo: datetime
+    fecha_carga: datetime
+    dispositivo_id: str
+    polipasto_id: str
+    mediciones: list[MedicionOut]
+
 
 class MonitoreoResumen(BaseModel):  # ejemplo de respuesta corta
     fecha_monitoreo: datetime

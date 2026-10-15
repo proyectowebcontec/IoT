@@ -6,7 +6,7 @@ from database.mongodb import monitoreos_collection, polipastos_collection, dispo
 from models.entradasensor import EntradaSensor
 from models.errores import RecursoNoEncontradoError
 from schemas.medicionpunto import MedicionPunto
-from schemas.monitoreo import MedicionOut, MonitoreoListado, MonitoreoOut
+from schemas.monitoreo import MedicionOut, MonitoreoListado, MonitoreoOut, MonitoreoOutReporte
 from schemas.dispositivos import EstadoDispositivo
 from utils.validaciones import _validar_rango_fechas
 from utils.filtrado_enlace import _filtro_fechas, _obtener_catalogo
@@ -178,7 +178,7 @@ def obtener_historial_entrada(
 # ---------------------------------------------------------------------------
 # Monitoreos de un dispositivo en un rango de fechas
 # ---------------------------------------------------------------------------
-@router.get("/{id_dispositivo}/{f_inicio}/{f_fin}", response_model=list[MonitoreoOut])
+@router.get("/{id_dispositivo}/{f_inicio}/{f_fin}", response_model=list[MonitoreoOutReporte])
 def obtener_monitoreos_por_rango(
     id_dispositivo: str,
     f_inicio: datetime,
@@ -204,8 +204,10 @@ def obtener_monitoreos_por_rango(
         )
 
     return [
-        MonitoreoOut(
+        MonitoreoOutReporte(
+            id=str(d["_id"]),
             fecha_monitoreo=d["fecha_monitoreo"],
+            fecha_carga=d["fecha_carga"],
             dispositivo_id=d["meta"]["dispositivo_id"],
             polipasto_id=str(d["meta"]["polipasto_id"]),
             mediciones=[
