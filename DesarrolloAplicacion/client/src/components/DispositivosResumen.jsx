@@ -13,8 +13,9 @@ function ResumenCard({ colorClass, label, value }) {
 // resumen: { total, conectados, desconectados }
 export default function DispositivosResumen({ resumen }) {
   return (
-    <section className="cards-grid cards-grid--3">
+    <section className="cards-grid cards-grid--4">
       <ResumenCard colorClass="blue-card" label="Total de dispositivos" value={resumen.total} />
+      <ResumenCard colorClass="orange-card" label="Mantenimiento" value={resumen.mantenimiento} />
       <ResumenCard colorClass="green-card" label="Conectados" value={resumen.conectados} />
       <ResumenCard colorClass="red-card" label="Desconectados" value={resumen.desconectados} />
     </section>

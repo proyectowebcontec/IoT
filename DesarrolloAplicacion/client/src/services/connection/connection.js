@@ -62,9 +62,11 @@ export const obtenerNoMonitoreos = async (empresa_id, sucursal_id = null, area_i
     }
 };
 
-export const obtenerDispositivosAbsolutos = async () => {
+export const obtenerDispositivosAbsolutos = async (empresa_id, sucursal_id = null, area_id = null, nave_id = null) => {
     try {
-        const response = await connection.get('/dispositivos');
+        const response = await connection.get('/dispositivos', {
+            params: { empresa_id, sucursal_id, area_id, nave_id,}
+        });
 
         return response.data;
     } catch (error) {
@@ -318,9 +320,9 @@ export const obtener_conteo_ubicacion = async (
     }
 }
 
-export const obtener_dispositivos_ubicacion = async (empresa_id, sucursal_id = null, area_id = null, nave_id = null, estado = "online") => {
+export const obtener_dispositivos_resumen = async (empresa_id, sucursal_id = null, area_id = null, nave_id = null, estado = "online") => {
     try {
-        const response = await connection.get(`/dispositivos/ubicacion`, {
+        const response = await connection.get(`/dispositivos/resumen`, {
             params: { empresa_id, sucursal_id, area_id, nave_id, estado }
         });
 
