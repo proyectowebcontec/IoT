@@ -10,48 +10,39 @@ import { Bounce, toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const FILTROS_INICIALES = {
+  empresaId: "",
+  sucursalId: "",
+  areaId: "",
+  naveId: "",
   dispositivoId: "",
   fechaInicio: "",
   fechaFin: "",
 };
 
+const JERARQUIA = ["empresaId", "sucursalId", "areaId", "naveId", "dispositivoId"];
+
 export default function Historial() {
-  const [status, setStatus] = useState(0);
+  const [arbol, setArbol] = useState([]);
   const [dispositivos, setDispositivos] = useState([]);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
   const [registros, setRegistros] = useState([]);
   const [descargando, setDescargando] = useState(false);
 
-  // Cargar la lista de dispositivos igual que en Dashboard.jsx
+  // Cargar la lista de empresas igual que en Dashboard.jsx
 useEffect(() => {
 
-    const fetchDispositivos = async () => {
-      try {
-        const resDispositivos = await Service.obtenerDispositivos();
-
-        setDispositivos(resDispositivos)
-        //console.log(metrics.dispositivos)
-      } catch (error) {
-        console.error("Error al contar dispositivos:", error);
-        toast.error("Error al contar los dispositivos.", {position: 'top-right'})
-      }
-      
-    }
-
-    const fetchStatus = async () => {
-      try {
-        const estado = await Service.is_connected();
-
-        setStatus(estado);
-        //console.log(estado)
-      } catch (error) {
-        console.error("Error al verificar salud de la API", error);
-        toast.error("Error: El sistema no está disponible.", { position: 'top-right' })
-      }
+  const fetchEmpresas = async () => {
+    try {
+      const arbolEmpresas = await Service.obtener_arbol_empresas();
+      setArbol(arbolEmpresas);
+    } catch (error) {
+      console.error("Error al consultar empresas registradas:", error);
+      toast.error(`Error: No se encontraron empresas registradas.`, { position: 'top-right' });
     }
     
-    fetchDispositivos()
-    fetchStatus()
+  }
+
+  fetchEmpresas();
   }, []);
 
 useEffect(() => {
@@ -64,15 +55,59 @@ useEffect(() => {
 
       handleBuscar();
     }
-  }, [filtros]);
+  }, [filtros.fechaFin, filtros.fechaInicio, filtros.dispositivoId]);
+
+  // -------------------------------------------------------------------------
+  //       CARGA DINAMICA DE LOS DISPOSITIVOS
+  // -------------------------------------------------------------------------
+    useEffect(() => {
+  
+      const fetchDispositivos = async () => {
+        try {
+          const resDispositivos = await Service.obtener_dispositivos_ubicacion(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
+  
+          setDispositivos(resDispositivos)
+        } catch (error) {
+          console.error("Error al listar dispositivos:", error);
+          toast.error(`Error: No se encontraron dispositivos.`, { position: 'top-right' });
+        }
+        
+      }
+  
+      if (!filtros.empresaId){
+        return;
+      }
+  
+      fetchDispositivos();
+      
+    }, [filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId, filtros.dispositivoId]);
+  
 
   const handleFiltroChange = (field, value) => {
+    // Si el usuario modifica Empresa, sucursal, area o nave a mano, los que
+    // están por debajo en la jerarquía deben reestablecerse
+    if (field !== "dispositivoId" && !field.startsWith("fecha")){
+      setFiltros((prev) => {
+        const next = { ...prev, [field]: value };
+
+        // Reinicia todos los niveles por debajo del campo modificado
+        const idx = JERARQUIA.indexOf(field);
+        if (idx !== -1) {
+          JERARQUIA.slice(idx + 1).forEach((hijo) => {
+            next[hijo] = "";
+          });
+        }
+
+        return next;
+      });
+    }
+
     setFiltros((prev) => ({ ...prev, [field]: value }));
   };
 
  const handleBuscar = async () => {
     try {
-      const data = await Service.obtenerMonitoreos(filtros.dispositivoId, filtros.fechaInicio, filtros.fechaFin);
+      const data = await Service.obtenerMonitoreosAbsolutos(filtros.dispositivoId, filtros.fechaInicio, filtros.fechaFin);
       //console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
       setRegistros(data);
       //console.log(data)
@@ -125,6 +160,7 @@ useEffect(() => {
         <DashboardNavbar />
 
         <HistorialFilters
+          empresas={arbol}
           dispositivos={dispositivos}
           filtros={filtros}
           onChange={handleFiltroChange}
