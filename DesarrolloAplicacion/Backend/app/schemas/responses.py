@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from models.entradasensor import EntradaSensor
+from schemas.usuario import UsuarioResumen
 
 class BaseResponse(BaseModel):
     id: int
@@ -18,3 +19,23 @@ class PulsosResponse(BaseModel):
     IDDispositivo: str
     entrada: EntradaSensor
     total: float
+
+class PromedioCanalOut(BaseModel):
+    canal: int
+    entrada: str | None = None
+    descripcion: str | None = None
+    unidad: str | None = None
+    promedio: float | None
+    muestras: int
+
+
+class PromediosResponse(BaseModel):
+    IDDispositivo: str
+    ventana: str          # "ultimos_500_registros" o "ultimas_24_horas"
+    registros: int
+    promedios: list[PromedioCanalOut]
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    usuario: UsuarioResumen

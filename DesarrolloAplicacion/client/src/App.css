@@ -345,6 +345,22 @@ body {
 
 }
 
+.filters-pre-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr
+        1.2fr
+        1fr
+        auto;
+
+    gap: 15px;
+
+    align-items: end;
+
+}
+
 
 .filters-grid {
 

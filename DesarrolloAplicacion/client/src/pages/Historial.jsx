@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Header from "../components/Header";
 import DashboardNavbar from "../components/DashboardNavbar";
 import HistorialFilters from "../components/HistorialFilters";
 import HistorialTable from "../components/HistorialTable";
@@ -7,69 +6,115 @@ import HistorialTable from "../components/HistorialTable";
 import { monitoreotoCSV } from "../utils/MonitoreotoCsv";
 import Service from '../services/Service';
 
+import { Bounce, toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const FILTROS_INICIALES = {
+  empresaId: "",
+  sucursalId: "",
+  areaId: "",
+  naveId: "",
   dispositivoId: "",
   fechaInicio: "",
   fechaFin: "",
 };
 
+const JERARQUIA = ["empresaId", "sucursalId", "areaId", "naveId", "dispositivoId"];
+
 export default function Historial() {
-  const [status, setStatus] = useState(0);
+  const [arbol, setArbol] = useState([]);
   const [dispositivos, setDispositivos] = useState([]);
   const [filtros, setFiltros] = useState(FILTROS_INICIALES);
   const [registros, setRegistros] = useState([]);
   const [descargando, setDescargando] = useState(false);
 
-  // Cargar la lista de dispositivos igual que en Dashboard.jsx
+  // Cargar la lista de empresas igual que en Dashboard.jsx
 useEffect(() => {
 
-    const fetchDispositivos = async () => {
-      try {
-        const resDispositivos = await Service.obtenerDispositivos();
-
-        setDispositivos(resDispositivos)
-        //console.log(metrics.dispositivos)
-      } catch (error) {
-        console.error("Error al contar dispositivos:", error);
-      }
-      
-    }
-
-    const fetchStatus = async () => {
-      try {
-        const estado = await Service.is_connected();
-
-        setStatus(estado);
-        console.log(estado)
-      } catch (error) {
-        console.error("Error al verificar salud de la API", error);
-      }
+  const fetchEmpresas = async () => {
+    try {
+      const arbolEmpresas = await Service.obtener_arbol_empresas();
+      setArbol(arbolEmpresas);
+    } catch (error) {
+      console.error("Error al consultar empresas registradas:", error);
+      toast.error(`Error: No se encontraron empresas registradas.`, { position: 'top-right' });
     }
     
-    fetchDispositivos()
-    fetchStatus()
+  }
+
+  fetchEmpresas();
   }, []);
 
 useEffect(() => {
     if(filtros.fechaInicio!=="" & filtros.fechaInicio !== "" & filtros.fechaFin!==""){
       //console.log("####################################################################")
+      if (filtros.dispositivoId === ''){
+        toast.error("Error: Debe indicar un dispositivo.", {position:'top-right'})
+        return;
+      }
+
       handleBuscar();
     }
-  }, [filtros]);
+  }, [filtros.fechaFin, filtros.fechaInicio, filtros.dispositivoId]);
+
+  // -------------------------------------------------------------------------
+  //       CARGA DINAMICA DE LOS DISPOSITIVOS
+  // -------------------------------------------------------------------------
+    useEffect(() => {
+  
+      const fetchDispositivos = async () => {
+        try {
+          const resDispositivos = await Service.obtener_dispositivos_resumen(filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId);
+  
+          setDispositivos(resDispositivos)
+        } catch (error) {
+          console.error("Error al listar dispositivos:", error);
+          toast.error(`Error: No se encontraron dispositivos.`, { position: 'top-right' });
+        }
+        
+      }
+  
+      if (!filtros.empresaId){
+        return;
+      }
+  
+      fetchDispositivos();
+      
+    }, [filtros.empresaId, filtros.sucursalId, filtros.areaId, filtros.naveId, filtros.dispositivoId]);
+  
 
   const handleFiltroChange = (field, value) => {
+    // Si el usuario modifica Empresa, sucursal, area o nave a mano, los que
+    // están por debajo en la jerarquía deben reestablecerse
+    if (field !== "dispositivoId" && !field.startsWith("fecha")){
+      setFiltros((prev) => {
+        const next = { ...prev, [field]: value };
+
+        // Reinicia todos los niveles por debajo del campo modificado
+        const idx = JERARQUIA.indexOf(field);
+        if (idx !== -1) {
+          JERARQUIA.slice(idx + 1).forEach((hijo) => {
+            next[hijo] = "";
+          });
+        }
+        return next;
+      });
+      return;
+    }
+
     setFiltros((prev) => ({ ...prev, [field]: value }));
   };
 
  const handleBuscar = async () => {
     try {
-      const data = await Service.obtenerMonitoreos(filtros.dispositivoId, filtros.fechaInicio, filtros.fechaFin);
+      const data = await Service.obtenerMonitoreosAbsolutos(filtros.dispositivoId, filtros.fechaInicio, filtros.fechaFin);
       //console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
       setRegistros(data);
-      console.log(data)
+      //console.log(data)
     } catch (error) {
       setRegistros([])
       console.error("Error al obtener monitoreos:", error);
+      toast.error(`Error:  Al consultar todos los monitoreos.`, { position: 'top-right' });
     } 
  };
 
@@ -78,7 +123,7 @@ useEffect(() => {
     setDescargando(true);
     try {
       if (!registros || registros.length === 0) {
-        alert("No hay registros para descargar en ese rango.");
+        toast.info("No hay registros para descargar en ese rango.",{position:'top-right'});
         return;
       }
 
@@ -93,9 +138,11 @@ useEffect(() => {
       a.download = `historial-${filtros.dispositivoId || "todos"}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+
+      toast.success("CSV generado con éxito", { position: 'top-right' })
     } catch (err) {
       console.error(err);
-      alert("Ocurrió un error al generar el CSV.");
+      toast.error("Ocurrió un error al generar el CSV.", { position: 'top-right' });
     } finally {
       setDescargando(false);
     }
@@ -103,9 +150,6 @@ useEffect(() => {
 
   return (
     <>
-      <Header status={status}/>
-
-      <main className="content">
         <div className="page-header">
           <div>
             <h1>Historial</h1>
@@ -116,6 +160,7 @@ useEffect(() => {
         <DashboardNavbar />
 
         <HistorialFilters
+          empresas={arbol}
           dispositivos={dispositivos}
           filtros={filtros}
           onChange={handleFiltroChange}
@@ -124,7 +169,19 @@ useEffect(() => {
         />
 
         <HistorialTable registros={registros} />
-      </main>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition= {Bounce}
+        />
     </>
   );
 }

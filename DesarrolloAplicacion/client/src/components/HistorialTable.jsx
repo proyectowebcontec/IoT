@@ -61,12 +61,12 @@ export default function HistorialTable({ registros }) {
               data.map((r) => {
                 // Convierte el arreglo en { U5: 19.63, U6: 9.61, ... }
                 const valores = Object.fromEntries(
-                  (r.Mediciones ?? []).map((m) => [m.entrada, m.valor])
+                  (r.mediciones ?? []).map((m) => [m.entrada, m.valor])
                 );
                 return (
-                  <tr key={r.IDMonitoreo}>
-                    <td>{fmtFecha.format(new Date(r.FechaMonitoreo))}</td>
-                    <td>{r.IDDispositivo}</td>
+                  <tr key={r.id}>
+                    <td>{fmtFecha.format(new Date(r.fecha_monitoreo))}</td>
+                    <td>{r.dispositivo_id}</td>
                     {COLUMNAS.map((c) => (
                       <td key={c.entrada}>{formatear(valores[c.entrada], c.decimales)}</td>
                     ))}

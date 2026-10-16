@@ -8,6 +8,8 @@ BROKER = os.getenv('BROKER')
 PORT = int(os.getenv('PORT'))
 TOPIC = os.getenv('TOPIC')
 CLIENT_ID = os.getenv('CLIENT_ID')
+MQTT_USER = os.getenv('MQTT_USER')
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD')
 
 MONGO_URI = os.getenv('MONGO_URI')
 DATABASE_NAME = os.getenv('DATABASE_NAME')
