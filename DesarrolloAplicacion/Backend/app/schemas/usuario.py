@@ -38,3 +38,6 @@ class UsuarioResumen(BaseModel):       # respuesta corta para listados
     nombre: str
     rol: str
 
+class UsuarioLogin(BaseModel):
+    email: EmailStr
+    password: str
