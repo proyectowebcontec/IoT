@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import '../styles/FormLogin.css';
 import { useState } from 'react';
-//import Service from '../services/Service';
+import Service from '../services/Service';
 
 
 export default function FormLogin() {
@@ -11,7 +11,7 @@ export default function FormLogin() {
     const [email, setCorreo] = useState('');
     const [password, setContrasenia] = useState('');
     
-
+    // Para más adelante en caso de otros roles y MFA
     /*const openAuthPopup = () => {
         const popup = window.open(
           "/autenticacion", // Ruta del componente emergente
@@ -37,19 +37,23 @@ export default function FormLogin() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const datos = {
+            const data = {
                 email,
                 password,
             };
 
-            //const response = await Service.LoginCredenciales(datos)
+            const response = await Service.Login(data)
+            console.log(response)
             // Guarda el id del usuario en localStorage antes de redirigir
-            //localStorage.setItem('userId', response.userId)
+            localStorage.setItem('userId', response.usuario._id)
+            // Guardar el token en localstorage
+            // No es seguro debería ser en una cookie (queda pendiente para más adelante)
+            localStorage.setItem("token", response.access_token)
             navigate('/dashboardadmin');
             
         } catch (err) {
             console.log(err);
-            setMensaje(err.error);
+            setMensaje(err.detail);
         }
     };
 

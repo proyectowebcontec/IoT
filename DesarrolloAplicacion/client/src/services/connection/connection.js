@@ -8,6 +8,23 @@ const connection = axios.create({
     }
 });
 
+connection.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
+
+connection.interceptors.response.use(
+    (r) => r,
+    (error) => {
+        if (error.response?.status === 401 && !error.config.url.includes("/auth/login")) {
+            localStorage.removeItem("token");
+            window.location.href = "/";     // ajusta a tu ruta
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const is_connected = async() => {
     try {
         const response = await connection.get('/health');
@@ -19,6 +36,16 @@ export const is_connected = async() => {
     }
 }
 
+export const Login = async (data) => {
+    try {
+        const response = await connection.post("/auth/login", data);
+
+        return response.data;
+    } catch (error) {
+        console.error("Error iniciando sesion:", error);
+        throw error.response.data;  
+    }
+}
 
 export const obtenerConteoDispositivos = async () => {
     try {

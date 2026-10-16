@@ -8,8 +8,9 @@ export default function DashboardNavbar() {
     isActive ? "nav-link active" : "nav-link";
 
   const handleLogout = () => {
-      localStorage.removeItem('usuario'); // Elimina el usuario logeado
-      console.log("FUERA!!!")
+      localStorage.removeItem('userId'); // Elimina el usuario logeado
+      localStorage.removeItem('token'); // Elimina el token
+      //console.log("FUERA!!!")
       toast.success('Has cerrado sesión', {position: 'top-right'});
   };
 
