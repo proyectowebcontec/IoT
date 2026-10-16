@@ -166,6 +166,20 @@ body {
 
 }
 
+.status-indicator2 {
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background-color: #d95555;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(217, 85, 85, 0.15);
+
+}
 
 /* ============================= */
 /* CABECERA DE PÁGINA             */
@@ -328,6 +342,22 @@ body {
     color: var(--text-secondary);
 
     font-size: 0.82rem;
+
+}
+
+.filters-pre-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr
+        1.2fr
+        1fr
+        auto;
+
+    gap: 15px;
+
+    align-items: end;
 
 }
 
