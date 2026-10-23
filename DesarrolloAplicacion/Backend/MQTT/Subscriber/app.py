@@ -47,6 +47,9 @@ DESCRIPCIONES = {
     "S": "Sensor S",
 }
 
+NOMBRE_ENTRADAS = ["fecha","U1", "U2", "U3", "DI3", "DI4"]
+DESCRIPCIONES_ENTRADAS = ["fecha monitoreo","Voltaje U1", "Voltaje U2", "Voltaje U3", "Entrada digital DI3", "Entrada digital DI4"]
+
 # --------------------------------------
 # Estado compartido
 # --------------------------------------
@@ -73,7 +76,9 @@ def construir_monitoreo(data: GatewayData) -> Monitoreo:
     #fecha_gateway = datetime.strptime(data.times, FORMATO_FECHA)
     mediciones = []
 
+    # Solo vendrá uno el for está de más
     for indice, sensor in enumerate(data.sensorDatas, start=1):
+        # AHORA ---- sensor.flag = monitoreo_completo
         entrada = sensor.flag
 
         if sensor.value is not None:
@@ -81,6 +86,28 @@ def construir_monitoreo(data: GatewayData) -> Monitoreo:
             valor = ((v - 0.8) * 2.1 / 0.28) + 6.2 if entrada in ENTRADAS_CONVERTIR else v
         elif sensor.switcher is not None:
             valor = sensor.switcher
+        elif sensor.str is not None:
+            # Aquí se debería construir el todos los monitoreos con su entrada correspondiente
+            valores = sensor.str.split("|") 
+            for i, value in valores:
+              # ¿validar que no sea 0? ¿que sea un número válido? ¿que sea una fecha correcta?
+              # Las analógicas U1 a U3 sí deben convertirse 
+              if i < 3:
+                v = float(value)
+                valor = ((v - 0.8) * 2.1 / 0.28) + 6.2
+              else:
+                valor = value
+
+              mediciones.append(
+                  Medicion(
+                      IdMedicion=i,
+                      descripcion=DESCRIPCIONES_ENTRADAS[i],
+                      entrada=NOMBRE_ENTRADAS[i],
+                      valor=valor,
+                  )
+              )
+
+            continue
         else:
             continue  # Sin valor útil
 
